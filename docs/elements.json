@@ -1,0 +1,26 @@
+{
+    "0": {
+        "name": "Lightning"
+    },
+    "1": {
+        "name": "Earth"
+    },
+    "2": {
+        "name": "Ice"
+    },
+    "3": {
+        "name": "Wind"
+    },
+    "4": {
+        "name": "Poison"
+    },
+    "5": {
+        "name": "Fire"
+    },
+    "6": {
+        "name": "Water"
+    },
+    "7": {
+        "name": "Light"
+    }
+}
