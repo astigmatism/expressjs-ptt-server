@@ -23,4 +23,21 @@ When cloning, do these:
 
 8) Create a folder for the application to reside in. Clone repo into it :)
 
+npm install:
+
+npm install jade
+npm install memcached
+npm install mongodb
+npm install monk
+npm install type-of-is
+
+Tools useful for development:
+
+Sublime Packges: 
+
+Open Package Control: Preferences -> Package Control
+Select Package Control: Install Package
+
+- DocBlockr
+
 
