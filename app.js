@@ -73,10 +73,6 @@ console.log('environment: ' + app.get('env')); //show env in console for verific
 var library = new Library({
     forceLoad: true,
     callback: function() {
-
-        console.log(library._cardsByName);
-        //console.log(library.getCardByName('Ward'));
-
     }
 });
 

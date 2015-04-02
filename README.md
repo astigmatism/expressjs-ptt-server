@@ -23,15 +23,24 @@ When cloning, do these:
 
 8) Create a folder for the application to reside in. Clone repo into it :)
 
+9) Run the app: DEBUG=expressjs-ptt-server ./bin/www
+
 npm install:
 
 npm install jade
-npm install memcached
+//npm install memcached
+npm install node-cache //new caching?
 npm install mongodb
 npm install monk
 npm install type-of-is
+npm install async
+npm install -g node-inspector
 
 Tools useful for development:
+
+NodeJs Debugging:
+with: npm install -g node-inspector
+to start: node-debug app.js
 
 Sublime Packges: 
 
