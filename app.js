@@ -70,10 +70,7 @@ app.use(function(err, req, res, next) {
 //initialization tasks:
 console.log('environment: ' + app.get('env')); //show env in console for verification
 
-var library = new Library({
-    forceLoad: true,
-    callback: function() {
-    }
-});
+var library = new Library();
+library.loadLibrary();
 
 module.exports = app;

@@ -4,53 +4,66 @@
 
 var config = require('../config.js');
 var data = require('../models/data.js');
+var async = require('async');
+var type = require('type-of-is');
 
 /**
  * Library constructor
- * @param {Object}
- *  forceLoad: {Boolean} should the library's data be loaded directly from its source (true) or is cache okay? (false, default)
  */
-function Library(options) {
+function Library() {
+};
 
-    //params
-    var forceLoad           = options.forceLoad || false;
-    var callback            = options.callback;
+/**
+ * Returns card data given a card id or id's
+ * @param  {String|Array|Number}   ids      The card id or id's in an array
+ * @param  {Function} callback The function to return all data to
+ * @return {Undefined}            
+ */
+Library.prototype.getCardsById = function(ids, callback) {
+    
+    var me          = this;
+    var results     = {};
 
-    //scoped
-    var me                     = this;
-
-    //if we've specified a force load, load directly from source
-    if (forceLoad) {
-        me.loadDataFromSource({
-            callback: callback
-        });
-        return;
+    if (!type.is(ids, Array)) {
+        ids = [ids];
     }
 
-    //if not a force load, take from cache
-    data.getCache({
-        keys:       ['LibraryCardsById','LibraryCardsByName'],
-        callback:  function(content) {
-                
-            if (content.LibraryCardsById && content.LibraryCardsByName) {
-                global.cardsById   = content.LibraryCardsById;
-                global.cardsByName = content.LibraryCardsByName;
-                callback();
-                return;
+    //load card id hash from cache.
+    data.getCache('LibraryCardsById', function(content) {
+        if (content) {
+            
+            var i = 0;
+            for (i; i < ids.length; ++i) {
+                if (content.LibraryCardsById.hasOwnProperty(ids[i])) {
+                    results[ids[i]] = content.LibraryCardsById[ids[i]];
+                } else {
+                    results[ids[i]] = null;
+                }
             }
-
-            //if cache not defined, load from source again
-            me.loadDataFromSource({
-                callback: callback
+            callback(results);
+            return;
+        } 
+        //if not in cache, load from source and try again
+        else {
+            me.loadLibrary(function() {
+                me.getCardById(id, callback);
             });
         }
     });
+    
 };
 
-Library.prototype.loadDataFromSource = function(options) {
+/**
+ * Load's all library content into cache from data sources (files or mongo)
+ * In the case of a source load error, a hard exception is throw as this data is essentially for proper application function
+ * @param  {Function} optional. callback The function to call on load completion
+ * @return {Undefined}            
+ */
+Library.prototype.loadLibrary = function(opt_callback) {
 
-    var callback            = options.callback;
-    var me                  = this;
+    var me                  = this;    
+    var cardsById           = {};
+    var cardsByName         = {};
 
 
     //retrieve card data from file (or cache)
@@ -64,30 +77,26 @@ Library.prototype.loadDataFromSource = function(options) {
             for (i; i < content.basic.length; ++i) {
                 var item = content.basic[i];
                 if (item.hasOwnProperty('id')) {
-                    global.cardsById[String(item.id)] = item;
+                    cardsById[String(item.id)] = item;
                 }
                 if (item.hasOwnProperty('name')) {
-                    global.cardsByName[item.name] = item;   
+                    cardsByName[item.name] = item;   
                 }
             }
-
-            //TODO: It's possible we'll process other card sets in the future?
 
             data.setCache({
                 items: [
                     {
                         key: 'LibraryCardsById',
-                        content: global.cardsById
+                        content: cardsById
                     },
                     {
                         key: 'LibraryCardsByName',
-                        content: global.cardsByName
+                        content: cardsByName
                     }
                 ],
                 callback: function() {
-
-                    //finally, callback saying the constructor compeltely successfully
-                    callback();
+                    if (opt_callback) opt_callback();
                 }
             });
         },
@@ -95,22 +104,6 @@ Library.prototype.loadDataFromSource = function(options) {
             throw new Error(error);     //throw hard exception when we cannot retrieve the card data from its source, the application cannot function any further
         }
     });
-};
-
-Library.prototype.getCardById = function(id) {
-    
-    if (global.cardsByName.hasOwnProperty(id)) {
-        return global.cardsByName[id];
-    }
-    return null;
-};
-
-Library.prototype.getCardByName = function(name) {
-    
-    if (global.cardsByName.hasOwnProperty(name)) {
-        return global.cardsByName[name];
-    }
-    return null;
 };
 
 module.exports = Library;

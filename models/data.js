@@ -34,7 +34,7 @@ exports.getFile = function(options) {
     var forceLoad       = options.forceLoad || false;       //ignore cache attempt and load data from source
 
     //attempt to retireve file contents. cachekey is file path
-    memcached.get(path, function(err, data) {
+    nodecache.get(path, function(err, data) {
 
         if (err) {
             errorCallback(err);
@@ -66,67 +66,41 @@ exports.getFile = function(options) {
             }
 
             console.info('File system get success: ' + fullPath);
-            
-            nodecache.set(path, content, cacheLifetime);
 
-            successCallback(content);        
+            nodecache.set(path, content, cacheLifetime, function() {
+                successCallback(content);
+            });
         });
     });
 };
 
 /**
- * get content from cache
- * @param  {Object} options
- *         key:         Array/String
- *         callback:    Function
- * @return {Object}     the object map with key content pairs. If key not found or error, value is returned as null         
+ * gets data from NodeCache service
+ * @param  {String|Array}   keys     The cache keys
+ * @param  {Function} callback The function to return the cached data to
+ * @return {Object}            With each key as a key
  */
-exports.getCache = getCache = function(options) {
-    
-    //required params
-    var keys            = options.keys || options.key;
-    var callback        = options.callback;
-    //scoped
-    var results         = {};
+exports.getCache = getCache = function(keys, callback) {
 
     if (!type.is(keys, Array)) {
         keys = [keys];
     }
 
-    async.eachSeries(keys, function(key, next) {
-
-        memcached.get(key, function(err, data) {
-            if (err || data === undefined) {
-                console.error(err || 'Memcached error: the key ' + key + ' is not defined');
-                results[key] = null;
-                next();
-            } else {
-                console.info('Memcached get success: ' + key);
-                results[key] = data;
-                next(); // next item in series
-            }
-        });
-    }, 
-    // Final callback after each item has been iterated over.
-    function() {
-        callback(results);
+    nodecache.get(keys, function(err, results) {
+        if (err) {
+            console.error(err);
+            callback({});
+        } else {
+            console.info('NodeCache get success: ' + keys);
+            callback(results);
+        }
     });
+
 };
 
-/**
- * set content in cache
- * @param {Object} options 
- *        callback:     Function (optional)
- *        items: [      Object/Array
- *        {
- *            key: to key to this cache to retrieve later
- *            content: the content to cache
- *            cacheLifetime: (optional) -1 is don't cache, default is 0 (forever)
- *        },
- *        ]
- */
+
 exports.setCache = setCache = function(options) {
-    
+
     //required params
     var items           = options.items;          //map with keys and content
     //optional params
@@ -144,11 +118,11 @@ exports.setCache = setCache = function(options) {
             next();            
         } else {
 
-            memcached.set(item.key, item.content, cacheLifetime, function (err) {
+            nodecache.set(item.key, item.content, cacheLifetime, function (err) {
                 if (err) {
                     console.error(err);
                 }
-                console.info('Memcached set success: ' + item.key);
+                console.info('NodeCache set success: ' + item.key);
                 next();
             });
         }
@@ -158,12 +132,3 @@ exports.setCache = setCache = function(options) {
         if (callback) callback();
     });
 };
-
-// exports.removeCache = removeCache = function(cachekey) {
-//     memcached.del(cachekey, function(err) {
-//         if (err) {
-//             throw err;
-//         }
-//         console.info('Memcached del success. ' + cachekey);
-//     });
-// };
