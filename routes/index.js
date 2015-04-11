@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
     
     var library = new Library();
 
-    library.getCardsById(100, function(cards) {
+    library.getCardsById([100,101, 102, 103, 104], function(cards) {
 
         console.info(cards);
 

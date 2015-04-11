@@ -29,12 +29,20 @@ npm install:
 
 npm install jade
 //npm install memcached
-npm install node-cache //new caching?
-npm install mongodb
-npm install monk
-npm install type-of-is
-npm install async
+npm install --save node-cache //new caching?
+npm install --save mongodb
+npm install --save monk
+npm install --save type-of-is
+npm install --save async
 npm install -g node-inspector
+npm install --save express-session
+
+npm install passport
+npm install passport-facebook
+
+Auth:
+
+working on this.
 
 Tools useful for development:
 
