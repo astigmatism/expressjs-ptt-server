@@ -1,0 +1,20 @@
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
+    passportLocalMongoose = require('passport-local-mongoose');
+
+var Account = new Schema({
+    username: String,
+    password: String,
+    wins: Number,
+    draws: Number,
+    loses: Number,
+    cards: [
+    	{
+    		id: Number
+    	}
+    ]
+});
+
+Account.plugin(passportLocalMongoose);
+
+module.exports = mongoose.model('Account', Account);

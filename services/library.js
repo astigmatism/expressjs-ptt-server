@@ -46,11 +46,38 @@ Library.prototype.getCardsById = function(ids, callback) {
         //if not in cache, load from source and try again
         else {
             me.loadLibrary(function() {
-                me.getCardById(id, callback);
+                me.getCardById(ids, callback);
             });
         }
     });
     
+};
+
+Library.prototype.getCardsByLevel = function(level, callback) {
+
+    var me      = this;
+    var results = [];
+
+    if (!type.is(level, Array)) {
+        level = [level];
+    }
+
+    //let's just get the cards by id hash from cache
+    data.getCache('LibraryCardsById', function(content) {
+        if (content) {
+
+            var i = 0;
+            for (i; i < content; ++i) {
+                
+            }
+        }
+        //if not in cache, load from source and try again
+        else {
+            me.loadLibrary(function() {
+                me.getCardsByLevel(level, callback);
+            });
+        }
+    });
 };
 
 /**

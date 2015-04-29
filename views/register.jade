@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    h1 Register
+    form(role='form', action="/register",method="post", style='max-width: 300px;')
+      .form-group
+          input.form-control(type='text', name="username", placeholder='Username')
+      .form-group
+        input.form-control(type='password', name="password", placeholder='Password')
+      button.btn.btn-default(type='submit') Submit
+      a(href='/')
+        button.btn.btn-primary(type="button") Cancel
+      br
+      h4= info
+      br
+      div Already have an account?&nbsp;
+        a(href='/login') Sign In

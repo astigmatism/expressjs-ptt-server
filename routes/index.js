@@ -2,20 +2,18 @@ var express = require('express');
 var router = express.Router();
 var Library = require('../services/library.js');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-    
-    var library = new Library();
+module.exports = function (app) {
 
-    library.getCardsById([100,101, 102, 103, 104], function(cards) {
+	app.get('/', function (req, res) {
+        
+		//var library = new Library();
 
-        console.info(cards);
+    	//library.getCardsById([100,101, 102, 103, 104], function(cards) {
 
-        res.render('index', { title: 'Express' });
+        res.render('index', { 
+            user : req.user 
+
+
+        });
     });
-
-    //res.render('index', { title: 'Express' });
-    
-});
-
-module.exports = router;
+};

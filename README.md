@@ -27,22 +27,35 @@ When cloning, do these:
 
 npm install:
 
-npm install jade
-//npm install memcached
-npm install --save node-cache //new caching?
+npm install --save jade
+npm install --save node-cache
 npm install --save mongodb
 npm install --save monk
 npm install --save type-of-is
 npm install --save async
 npm install -g node-inspector
 npm install --save express-session
+npm install --save mongoose
 
-npm install passport
-npm install passport-facebook
+npm install --save passport
+//npm install --save passport-facebook
+//npm install --save passport-twitter
+//npm install --save passport-google
+npm install --save passport-local
+npm install --save passport-local-mongoose
+npm install --save connect-mongo
+
+Unit testing stuff, not used yet.
+
+npm install mocha --save
+npm install chai --save
+npm install should --save
 
 Auth:
 
-working on this.
+I got most of my info from (http://mherman.org/blog/2013/11/11/user-authentication-with-passport-dot-js/#.VT_mUq1Vikr)
+Auth was build around the Passport plugin and was implemented mainly by following the tutorial. Very little of the code is my own work.
+Session details are stored in a cookie (with auth) thanks to express-session, passport and mongostore.
 
 Tools useful for development:
 
