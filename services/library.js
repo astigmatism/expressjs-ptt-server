@@ -1,17 +1,9 @@
-/**
- * Library
- */
-
 var config = require('../config.js');
 var data = require('../models/data.js');
 var async = require('async');
 var type = require('type-of-is');
+var utils = require('../models/utils');
 
-/**
- * Library constructor
- */
-function Library() {
-};
 
 /**
  * Returns card data given a card id or id's
@@ -19,7 +11,7 @@ function Library() {
  * @param  {Function} callback The function to return all data to
  * @return {Undefined}            
  */
-Library.prototype.getCardsById = function(ids, callback) {
+exports.getCardsById = function(ids, callback) {
     
     var me          = this;
     var results     = {};
@@ -53,28 +45,75 @@ Library.prototype.getCardsById = function(ids, callback) {
     
 };
 
-Library.prototype.getCardsByLevel = function(level, callback) {
+/**
+ * get a random card or set of cards given 
+ * @param  {[type]}   level    [description]
+ * @param  {Function} callback [description]
+ * @param  {[type]}   unique   [description]
+ * @return {[type]}            [description]
+ */
+exports.getRandomCardIdsByLevel = function(level, callback, unique) {
 
     var me      = this;
     var results = [];
+    unique      = unique || false;
 
     if (!type.is(level, Array)) {
         level = [level];
     }
 
-    //let's just get the cards by id hash from cache
-    data.getCache('LibraryCardsById', function(content) {
+    //load card id hash from cache.
+    data.getCache('LibraryCardsByLevel', function(content) {
+        
+        content = content.LibraryCardsByLevel;
+
         if (content) {
+            
+            var cardsbylevelpopped = {};
 
             var i = 0;
-            for (i; i < content; ++i) {
+            for (i; i < level.length; ++i) {
                 
+                var currentlevel = String(level[i]);
+                var cardsinlevel = content[currentlevel];
+
+                //if unique results only, lets copy all the cards of this level and put them in the cardsByLevelPop object so we can random without replacement
+                if (unique) {
+
+                    //build array if doesnt exist
+                    if (!type.is(cardsbylevelpopped[currentlevel], Array)) {
+                        cardsbylevelpopped[currentlevel] = [];
+                        for (var j = 0; j < cardsinlevel.length; ++j) {
+                            cardsbylevelpopped[currentlevel].push(cardsinlevel[j].id); //push the id into the pop array
+                        }
+                    }
+
+                    //ensure remaining entries exist
+                    if (cardsbylevelpopped[currentlevel].length > 0) {
+                        //shuffle the existing entries
+                        utils.shuffle(cardsbylevelpopped[currentlevel]);
+                        var item = cardsbylevelpopped[currentlevel].pop();
+                        results.push(item);
+                    } 
+                    else {
+                        results.push(null); //push null when no more cards are available
+                    }
+
+                } 
+                //otherwise just take a random card from the main cache
+                else {
+                    var item = cardsinlevel[Math.floor(Math.random()*cardsinlevel.length)].id;
+                    results.push(item);
+                }
+
             }
-        }
+            callback(results);
+            return;
+        } 
         //if not in cache, load from source and try again
         else {
             me.loadLibrary(function() {
-                me.getCardsByLevel(level, callback);
+                me.getRandomCardsByLevel(level, callback, unique);
             });
         }
     });
@@ -86,11 +125,13 @@ Library.prototype.getCardsByLevel = function(level, callback) {
  * @param  {Function} optional. callback The function to call on load completion
  * @return {Undefined}            
  */
-Library.prototype.loadLibrary = function(opt_callback) {
+exports.loadLibrary = function(opt_callback) {
 
     var me                  = this;    
     var cardsById           = {};
     var cardsByName         = {};
+    var cardsByLevel        = {};
+    var cardsByStrength     = {};
 
 
     //retrieve card data from file (or cache)
@@ -109,6 +150,18 @@ Library.prototype.loadLibrary = function(opt_callback) {
                 if (item.hasOwnProperty('name')) {
                     cardsByName[item.name] = item;   
                 }
+                if (item.hasOwnProperty('level')) {
+                    if (!type.is(cardsByLevel[item.level], Array)) {
+                        cardsByLevel[item.level] = [];
+                    }
+                    cardsByLevel[item.level].push(item);
+                }
+                if (item.hasOwnProperty('strength')) {
+                    if (!type.is(cardsByStrength[item.strength], Array)) {
+                        cardsByStrength[item.strength] = [];
+                    }
+                    cardsByStrength[item.strength].push(item);   
+                }
             }
 
             data.setCache({
@@ -120,6 +173,14 @@ Library.prototype.loadLibrary = function(opt_callback) {
                     {
                         key: 'LibraryCardsByName',
                         content: cardsByName
+                    },
+                    {
+                        key: 'LibraryCardsByStrength',
+                        content: cardsByStrength
+                    },
+                    {
+                        key: 'LibraryCardsByLevel',
+                        content: cardsByLevel
                     }
                 ],
                 callback: function() {
@@ -132,5 +193,3 @@ Library.prototype.loadLibrary = function(opt_callback) {
         }
     });
 };
-
-module.exports = Library;

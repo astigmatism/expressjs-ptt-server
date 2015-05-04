@@ -41,9 +41,11 @@ npm install --save passport
 //npm install --save passport-facebook
 //npm install --save passport-twitter
 //npm install --save passport-google
-npm install --save passport-local
-npm install --save passport-local-mongoose
+//npm install --save passport-local
+npm install --save passport-http
+//npm install --save passport-local-mongoose
 npm install --save connect-mongo
+npm install --save bcrypt-nodejs
 
 Unit testing stuff, not used yet.
 
@@ -53,9 +55,7 @@ npm install should --save
 
 Auth:
 
-I got most of my info from (http://mherman.org/blog/2013/11/11/user-authentication-with-passport-dot-js/#.VT_mUq1Vikr)
-Auth was build around the Passport plugin and was implemented mainly by following the tutorial. Very little of the code is my own work.
-Session details are stored in a cookie (with auth) thanks to express-session, passport and mongostore.
+Since this project is meant to be a restful server, I got most of my info from (http://scottksmith.com/blog/2014/05/29/beer-locker-building-a-restful-api-with-node-passport/)
 
 Tools useful for development:
 

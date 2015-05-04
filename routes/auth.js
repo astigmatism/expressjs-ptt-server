@@ -1,34 +1,39 @@
 var passport = require('passport');
 var Account = require('../models/account');
 var Library = require('../services/library.js');
+var BasicStrategy = require('passport-http').BasicStrategy;
 
 module.exports = function (app) {
 
-    app.get('/register', function(req, res) {
-        res.render('register', { });
-    });
+    //app.get('/register', function(req, res) {
+    //    res.render('register', { });
+    //});
 
     app.post('/register', function(req, res) {
-        
-        Account.register(new Account({ username: req.body.username }), req.body.password, function(err, account) {
+
+        var account = new Account({
+            username: req.body.username,
+            password: req.body.password
+        });
+
+        user.save(function(err) {
             if (err) {
-                return res.render('register', {
-                    info: 'Sorry. That username already exists. Try again.'
+                return res.json({
+                    success: false,
+                    error: err
                 });
             }
-
-            //account created
-            
-
-            passport.authenticate('local')(req, res, function () {
-                res.redirect('/');
+                
+            return res.json({
+                success: true,
+                user: account
             });
         });
     });
 
-    app.get('/login', function(req, res) {
-        res.render('login', { user : req.user });
-    });
+    //app.get('/login', function(req, res) {
+    //    res.render('login', { user : req.user });
+    //});
 
     app.post('/login', function(req, res, next) {
         passport.authenticate('local', function(err, account, info) {
@@ -59,6 +64,8 @@ module.exports = function (app) {
     app.get('/logout', function(req, res) {
         req.session.destroy();
         req.logout();
-        res.redirect('/');
+        res.json({
+            logout: true
+        });
     });
 };

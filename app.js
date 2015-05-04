@@ -5,16 +5,13 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var configuration = require('./config.js');
-var data = require('./models/data.js');
-var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
 var mongoose = require('mongoose');
 var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-//var TwitterStrategy = require('passport-twitter');
-//var GoogleStrategy = require('passport-google');
-//var FacebookStrategy = require('passport-facebook');
+var data = require('./models/data.js');
 var Library = require('./services/library.js');
+
+var authController = require('./controllers/auth');
+var userController = require('./controllers/user');
 
 var app = express();
 
@@ -37,31 +34,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-    secret: config.sessionsecret,
-    key: config.cookiename,//cookie name
-    cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
-    store: new MongoStore({
-        db:   config.dbname,
-        host: config.dbhost,
-        port: config.dbport
-    })
-}));
 app.use(passport.initialize());
-app.use(passport.session());
-
-// passport config
-var Account = require('./models/account');
-passport.use(new LocalStrategy(Account.authenticate()));
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
 
 mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
 
-// routes
-require('./routes/auth')(app);
-require('./routes/index')(app);
+// Create our Express router
+var router = express.Router();
 
+router.route('/users')
+    .get(authController.isAuthenticated, userController.users);
+
+router.route('/register')
+    .post(userController.register);
+
+app.use('/', router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -97,7 +83,6 @@ app.use(function(err, req, res, next) {
 //initialization tasks:
 console.log('environment: ' + app.get('env')); //show env in console for verification
 
-var library = new Library();
-library.loadLibrary();
+Library.loadLibrary();
 
 module.exports = app;

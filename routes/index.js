@@ -10,10 +10,9 @@ module.exports = function (app) {
 
     	//library.getCardsById([100,101, 102, 103, 104], function(cards) {
 
-        res.render('index', { 
+        res.json({ 
             user : req.user 
-
-
         });
+        
     });
 };
