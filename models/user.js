@@ -1,61 +1,79 @@
-// Load required packages
-var mongoose = require('mongoose');
-var bcrypt = require('bcrypt-nodejs');
 
-// Define our user schema
-var UserSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        unique: true,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    cards: [
-        {
-            id: Number,
-            obtained: Date,
-            ingame: Boolean,
-            notes: String
-        }
-    ]
-});
+var UserRecord = require('../schemas/user');
+var Library = require('../services/library');
+var async = require('async');
 
-// Execute before each user.save() call
-UserSchema.pre('save', function(callback) {
-    var user = this;
+exports.newUser = newUser = function(username, password, callback) {
 
-    // Break out if the password hasn't changed
-    if (!user.isModified('password')) {
-        return callback();
-    }
+    //choose the five cards this user will begin with
+    Library.getRandomCardIdsByLevel([1, 1, 1, 1, 2], function(cardids) {
 
-    // Password changed so we need to hash it
-    bcrypt.genSalt(5, function(err, salt) {
-        if (err) {
-            return callback(err);
+        cards = [];
+        for (var i = 0; i < cardids.length; ++i) {
+            cards.push({
+                id: cardids[i],
+                obtained: Date(),
+                ingame: false,
+                notes: 'starting card'
+            });
         }
 
-        bcrypt.hash(user.password, salt, null, function(err, hash) {
-            if (err) {
-                return callback(err);
-            }
-            user.password = hash;
-            callback();
+        var user = new UserRecord({
+            username: username,
+            password: password,
+            cards: cards
         });
-    });
-});
 
-UserSchema.methods.verifyPassword = function(password, callback) {
-    bcrypt.compare(password, this.password, function(err, isMatch) {
-        if (err) {
-            return callback(err);
+        user.save(function(err) {
+            if (err) {
+                callback({
+                    success: false,
+                    error: err
+                });
+                return;
+            }
+
+            callback({
+                success: true
+            });
+        });
+
+    }, true);
+};
+
+exports.getCards = getCards = function(user, callback) {
+
+    var cards = [];
+
+    Library.getIdDeck(function(deck) {
+
+        for (var i = 0; i < user.cards.length; ++i) {
+            cards.push({
+                userdata: user.cards[i],
+                carddata: deck[user.cards[i].id]
+            });
         }
-        callback(null, isMatch);
+        callback(cards);
     });
 };
 
-// Export the Mongoose model
-module.exports = mongoose.model('User', UserSchema);
+exports.deleteUser = deleteUser = function(user, callback) {
+
+    UserRecord.remove({ _id: user._id }, function(err) {
+        if (err) {
+            callback({
+                success: false,
+                error: err
+            });
+            return;
+        }
+
+        callback({
+            success: true
+        });
+    });
+};
+
+exports.giveCard = giveCard = function(user, cardid, reason, callback) {
+
+};

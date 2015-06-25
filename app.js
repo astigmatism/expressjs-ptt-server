@@ -23,7 +23,7 @@ if (app.get('env') === 'development') {
     config = configuration.data.development;
 }
 
-// view engine setup
+// view engine setup (use sparingly, this is a RESTFUL service)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -41,11 +41,11 @@ mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
 // Create our Express router
 var router = express.Router();
 
-router.route('/users')
-    .get(authController.isAuthenticated, userController.users);
+router.route('/user/').get(authController.isAuthenticated, userController.home);
 
-router.route('/register')
-    .post(userController.register);
+router.route('/user/').delete(authController.isAuthenticated, userController.deleteUser);
+
+router.route('/user/').post(userController.newUser);
 
 app.use('/', router);
 

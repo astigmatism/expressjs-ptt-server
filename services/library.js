@@ -4,6 +4,23 @@ var async = require('async');
 var type = require('type-of-is');
 var utils = require('../models/utils');
 
+/**
+ * Returns the card id mapped deck
+ * @param  {Function} callback 
+ * @return {undef}            
+ */
+exports.getIdDeck = function(callback) {
+
+    //if not in cache, load library again
+    data.getCache('LibraryCardsById', function(content) {
+        if (content && content.LibraryCardsById) {
+            callback(content.LibraryCardsById);
+        }
+        else {
+            loadLibrary(getDeckById(callback));
+        }
+    });
+};
 
 /**
  * Returns card data given a card id or id's
@@ -125,7 +142,7 @@ exports.getRandomCardIdsByLevel = function(level, callback, unique) {
  * @param  {Function} optional. callback The function to call on load completion
  * @return {Undefined}            
  */
-exports.loadLibrary = function(opt_callback) {
+exports.loadLibrary = loadLibrary = function(opt_callback) {
 
     var me                  = this;    
     var cardsById           = {};

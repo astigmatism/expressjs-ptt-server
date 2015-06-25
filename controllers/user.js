@@ -1,66 +1,36 @@
 // Load required packages
-var User = require('../models/user');
 var Library = require('../services/library');
+var User    = require('../models/user');
 
 // Create endpoint /api/users for POST
-exports.register = function(req, res) {
+exports.newUser = function(req, res) {
     
-    //choose the five cards this user will begin with
-    Library.getRandomCardIdsByLevel([1, 1, 1, 1, 2], function(cardids) {
+    var username = req.body.username;
+    var password = req.body.password;
 
-        cards = [];
-        for (var i = 0; i < cardids.length; ++i) {
-            cards.push({
-                id: cardids[i],
-                obtained: Date(),
-                ingame: false,
-                notes: 'starting card'
-            });
-        }
-
-        var user = new User({
-            username: req.body.username,
-            password: req.body.password,
-            cards: cards
+    if (!username || !password) {
+        return res.json({
+            success: false,
+            error: 'username or password not supplied in POST data'
         });
+    }
 
-        user.save(function(err) {
-            if (err) {
-                return res.json({
-                    success: false,
-                    error: err
-                });
-            }
-
-            return res.json({
-                success: true
-            });
-        });
-
-    }, true);
+    User.newUser(username, password, function(result) {
+        return res.json(result);
+    });
 };
 
-// Create endpoint /api/users for GET
-exports.users = function(req, res) {
+exports.deleteUser = function(req, res) {
 
-    Library.getRandomCardIdsByLevel([10, 9, 8], function(results) {
+    User.deleteUser(req.user, function(result) {
+        return res.json(result);
+    });
+};
 
-        return res.json(results);    
-    }, true);
-
+//mainly for feedback for now
+exports.home = function(req, res) {
     
-
-    // User.find(function(err, users) {
-    //   if (err) {
-    //       return res.json({
-    //           success: false,
-    //           error: err
-    //       })
-    //   }
-
-    //   return res.json({
-    //       success: true,
-    //       users: users
-    //   });
-    // });
+    User.getCards(req.user, function(result) {
+        return res.json(result);
+    });
 };
