@@ -11,7 +11,8 @@ var data = require('./models/data.js');
 var Library = require('./services/library.js');
 
 var authController = require('./controllers/auth');
-var userController = require('./controllers/user');
+var accountController = require('./controllers/account');
+var cardsController = require('./controllers/cards');
 
 var app = express();
 
@@ -41,11 +42,19 @@ mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
 // Create our Express router
 var router = express.Router();
 
-router.route('/user/').get(authController.isAuthenticated, userController.home);
+router.route('/account/').get(authController.isAuthenticated, accountController.home);
 
-router.route('/user/').delete(authController.isAuthenticated, userController.deleteUser);
+router.route('/account/').delete(authController.isAuthenticated, accountController.deleteAccount);
 
-router.route('/user/').post(userController.newUser);
+router.route('/account/new').post(accountController.newAccount);
+
+router.route('/cards/').get(authController.isAuthenticated, cardsController.getAllCards);
+
+router.route('/cards/hand').get(authController.isAuthenticated, cardsController.getHand);
+
+router.route('/cards/deck').get(authController.isAuthenticated, cardsController.getDeck);
+
+router.route('/cards/move').post(authController.isAuthenticated, cardsController.move);
 
 app.use('/', router);
 

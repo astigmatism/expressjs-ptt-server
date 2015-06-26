@@ -51,11 +51,17 @@ Consistancy in response rules:
 
 List of API's:
 
-POST 	user/	  	 		no auth 	[username, password]		-- creates a user given a username and password
-GET 	user/				auth 									-- returns something about the logged in user (used for testing mainly so far)
-DELETE	user/				auth 									-- deletes the currently logged in user
 
+POST 	account/new	  	 		[username, password]		-- no auth needed, creates a user given a username and password
+POST 	account/password		[password]					-- change your password
+GET 	account/											-- returns something about the logged in user (used for testing mainly so far)
+DELETE	account/											-- deletes your account
+GET 	cards/												-- returns all user cards
+GET 	cards/hand 											-- returns all user cards currently in hand
+GET 	cards/deck 											-- returns all user cards current NOT in hand (in deck)
+POST 	cards/move 				[hand, deck]				-- moves cards from user's hand to deck or vise-versa. takes comma delimited list of _ids
 
+These API's are all consumable from the standpoint of a logged in user. Avoid open endpoints which grant things or cheats.
 I've been using POSTMAN for Google Chrome the most during development but you can also try using CURL from the command line:
 curl -u username:password -X GET localhost:3000/user
 
@@ -73,6 +79,7 @@ npm install --save async
 npm install -g node-inspector
 npm install --save express-session
 npm install --save mongoose
+npm install merge --save					//for merging objects
 
 npm install --save passport
 //npm install --save passport-facebook

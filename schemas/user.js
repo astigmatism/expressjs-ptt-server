@@ -27,9 +27,9 @@ var UserSchema = new mongoose.Schema({
     },
     cards: [
         {
-            id: Number,
+            cardid: Number,
             obtained: Date,
-            ingame: Boolean,
+            inhand: Boolean,
             notes: String
         }
     ]
