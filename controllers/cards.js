@@ -6,13 +6,43 @@ exports.getAllCards = function(req, res) {
     
     var user = new User(req.user);
 
-    user.getCards(function(cards) {
+    user.getCards(function(err, cards) {
+        if (err) {
+            return res.json({
+                success: false,
+                error: err
+            });
+        }
+
         return res.json({
             success: true,
             cards: cards
         });
     });
 };
+
+exports.getLastUsed = function(req, res) {
+
+    var user = new User(req.user);
+
+    user.getCards(function(err, cards) {
+        if (err) {
+            return res.json({
+                success: false,
+                error: err
+            });
+        }
+
+        return res.json({
+            success: true,
+            cards: cards
+        });
+    }, 'lastUsed');
+};
+
+//DEPRICATED: the concept of moving cards from "hand" to "deck" is no longer used. cards are "ingame" or not
+
+/*
 
 exports.getHand = function(req, res) {
 
@@ -82,3 +112,4 @@ exports.moveToHand = function(req, res) {
         });
     });
 }
+*/

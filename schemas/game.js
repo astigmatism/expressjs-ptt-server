@@ -5,12 +5,17 @@ var mongoose = require('mongoose');
 var GameSchema = new mongoose.Schema({
     
     /**
-     * The maximum number of players needed to begin this game. 
-     * When a player begins a multiplayer game, they invite friends. This value is set to the number of players invited with the current player.
-     * Player's that have accepted to join are added to the array below and their "ingame" status is true (hand locked until finished)
-     * @type {Number}
+     * This game's current state
+     * Here are some ideas: Waiting for players, in progress, in sudden death, waiting for player to take cards.. etc
+     * @type {String}
      */
-    maxplayers: Number      
+    state: String,
+
+    /**
+     * Array of user id's: players that have been invited to play in this game but have not yet joined.
+     * @type {Array}
+     */
+    invited: [String],
     
     /**
      * The player's which are actively involved in this game. If they were invited, they are added here only after accepting the invition.
@@ -23,7 +28,7 @@ var GameSchema = new mongoose.Schema({
     }],
 
     /**
-     * The userid of the player whose turn it is
+     * The userid of the player whose turn it is should this be a game with mutliple actual players
      * @type {String}
      */
     playerturn: String,
@@ -35,17 +40,24 @@ var GameSchema = new mongoose.Schema({
     rules: [Number],
 
     /**
-     * if normal gameplay is over, this boolean tells us if the game is in sudden death
+     * The bonus, positive or negative, the elemental tiles add/sub from non-elemental matches (usually just 1)
      * @type {[type]}
      */
-    insuddendeath: Boolean,
-    elementbonus: Number,
+    elementbonus: {
+        type: Number,
+        default: 1
+    },
+
+    /**
+     * The game board state
+     * @type {Array}
+     */
     board: [{
         element: {
             type: Number,
             default: -1
         },    
-        cardid: String,     //card id 
+        cardid: String,     //card id (from library)
         captured: String    //user id who has captured
     }]
 

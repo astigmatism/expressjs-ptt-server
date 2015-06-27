@@ -57,10 +57,6 @@ POST 	account/password		[password]					-- change your password
 GET 	account/											-- returns something about the logged in user (used for testing mainly so far)
 DELETE	account/											-- deletes your account
 GET 	cards/												-- returns all user cards
-GET 	cards/hand 											-- returns all user cards currently in hand
-GET 	cards/deck 											-- returns all user cards current NOT in hand (in deck)
-POST 	cards/move 				[hand, deck]				-- moves cards from user's hand to deck or vise-versa. takes comma delimited list of _ids
-POST 	cards/move/hand 		[cardids]					-- given comma delimited array of cardids, moves them into hand
 POST 	game/new 											-- starts a new game
 
 These API's are all consumable from the standpoint of a logged in user. Avoid open endpoints which grant things or cheats.
@@ -103,10 +99,12 @@ npm install should --save
 
 Ideas to implement:
 
-- Campaign mode (1p)
-- Quick Game - maybe just put the user into a game quickly with a set of cards they wont own?
-- Multiplayer - seems like this type should use random cards the users don't actually own, otherwise it could be terribly off-balance. maybe a handicap modifier to make give others stronger decks?
-- 3 or more player on larger grid??
+- Campaign mode (1p), players use a deck of cards which they will build over the course of the campaign. 
+- I think it makes sense to build a hand JUST BEFORE the game begins, by default suggest last used set
+- Quick Game Type? NOPE. - maybe just put the user into a game quickly with a set of random cards? actually, this is akin to campaign mode with the side-effect that they'll see cards early -- forget it. A quick game is to play campaign and look for a random match.
+- Multiplayer - build a hand from your current set, get paired with someone with similar strength and win/loss? For playing with a friend(s), maybe choose friends first, determine maximum hand strength between them and then limit selection of hand?
+- Crazy boards? Sure the standard 3x3, maybe 4x4 or boards of iregular size? Maybe a boards json doc with specifictions?
+- Larger boards men playing with more cards, how to save which cards were last used??
 
 - Campaign mode - divided into "rule worlds" each ending with a "boss" of sorts with a strong deck. A minimum number of game need to be played in that world until the boss is reach but the player can continue to randomly play matches to earn better cards before the boss fight
 - World 1: Basic Rule only. First handful (5?) of games have no win rule then introduce take one.

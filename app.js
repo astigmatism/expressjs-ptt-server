@@ -50,13 +50,7 @@ router.route('/account/new').post(accountController.newAccount);
 
 router.route('/cards/').get(authController.isAuthenticated, cardsController.getAllCards);
 
-router.route('/cards/hand').get(authController.isAuthenticated, cardsController.getHand);
-
-router.route('/cards/deck').get(authController.isAuthenticated, cardsController.getDeck);
-
-router.route('/cards/move').post(authController.isAuthenticated, cardsController.move);
-
-router.route('/cards/move/hand').post(authController.isAuthenticated, cardsController.moveToHand);
+router.route('/cards/lastused').get(authController.isAuthenticated, cardsController.getLastUsed);
 
 app.use('/', router);
 

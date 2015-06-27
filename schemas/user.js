@@ -13,24 +13,65 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    /**
+     * The sum of all game wins for this player
+     * @type {Number}
+     */
     wins: {
     	type: Number,
     	default: 0
     },
+
+    /**
+     * The sum of all game losses for this player
+     * @type {Number}
+     */
     loses: {
     	type: Number,
     	default: 0
     },
+
+    /**
+     * The sum of all draw game results for this player
+     * @type {Number}
+     */
     draws: {
     	type: Number,
     	default: 0
     },
+
+    /**
+     * user's owned cards
+     * @type {Array|Object}
+     */
     cards: [
         {
-            cardid: Number,
-            obtained: Date,
-            inhand: Boolean,
-            notes: String
+            //_id                   //the unique if this card in mongo, use for db CRUD
+            cardid: Number,         //the card id which maps to the card library
+            //the date obtained
+            obtained: {
+                type: Date,         
+                default: Date()
+            },
+            //the game id (in mongo) for the game this card is currently participating in. empty string for no game
+            ingame: {
+                type: String,
+                default: ''
+            },
+            notes: String,          //any notes about the card itself, usually obtain information (like from a game, etc)
+            //a sum of the number of captures this card has been responsible for ;)
+            captures: {
+                type: Number,
+                default: 0
+            },
+            // a sum of the number of times this card was captured by another player in a game
+            taken: {
+                type: Number,
+                default: 0
+            },
+            // was this card used in the last game? We'll use this info to present a default hand to the player before a game
+            lastUsed: Boolean
         }
     ]
 });

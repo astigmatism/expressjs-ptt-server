@@ -24,9 +24,9 @@ function User(user) {
 
     /**
      * user's cards
-     * @type {Array|Objects}
+     * @type {Array}
      */
-    this._cards      = user.cards;
+    this._cards      = user.cards.toObject(); //mongoose objects are immutable, to extend this set, convert to object
 
     /**
      * password
@@ -69,8 +69,7 @@ User.create = function(username, password, callback) {
         for (var i = 0; i < cardids.length; ++i) {
             cards.push({
                 cardid: cardids[i],
-                obtained: Date(),
-                inhand: true,
+                lastUsed: true,         //set this to true so that the game understands these are your starting cards for your first game
                 notes: 'Starting Card'
             });
         }
@@ -101,84 +100,85 @@ User.prototype.remove = function(callback) {
 };
 
 /**
- * Creates a handy cardid lookup map, Sometimes usful as a utility when the alternative is to iterate over the this.cards array several times
- * @return {Object}
+ * utility: for better card management, create a map (by mongo id) of the cards array from mongo
+ * @param  {[type]} mongocards [description]
+ * @return {[type]}            [description]
  */
-User.prototype._createCardIdMap = function() {
+User.prototype._mapCards = function() {
 
     var cardmap = {};
-
     for (var i = 0; i < this._cards.length; ++i) {
         cardmap[this._cards[i]._id] = this._cards[i];
     }
-
     return cardmap;
 };
 
 /**
  * Returns all or a set of user's cards 
- * @param  {Function} callback 
- * @param  {String}   subset   all|hand|deck. defaults to all
+ * @param  {Function} callback
+ * @param  {String} subset      special rules around which cards should be returned: lastUsed|all
  * @return {undef}            
  */
 User.prototype.getCards = function(callback, subset) {
 
     subset = subset || 'all';
 
-    var cards = [];
-    var that = this;
+    var result = {};
+    var map = this._mapCards();
 
     Library.getIdDeck(function(library) {
 
-        //for loop seems to be slightly better for performance (than async)
-        for (var i = 0; i < that._cards.length; ++i) {
-            
-            if ((subset === 'hand' && that._cards[i].inhand) || (subset === 'deck' && !that._cards[i].inhand) || subset === 'all') {
-
-                var details = Utils.extend(library[that._cards[i].cardid], {
-                    _id: that._cards[i]._id,
-                    obtained: that._cards[i].obtained,
-                    inhand: that._cards[i].inhand,
-                    notes: that._cards[i].notes
-                });
-                cards.push(details);
+        
+        if (subset === 'lastUsed') {
+            for (card in map) {
+                if (map[card].lastUsed) {
+                    result[card] = Utils.extend({}, map[card], library[map[card].cardid]);        
+                }
             }
-        };
-        callback(cards);
+            callback(null, result);
+            return;
+        }
+
+        //default "all" behavior
+        for (card in map) {
+            result[card] = Utils.extend({}, map[card], library[map[card].cardid]);
+        }
+        callback(null, result);
     }); 
 };
 
 /**
+ * DEPRICATED: we no longer use the "inhand" or "indeck" concepts. cards are either "ingame" or not
  * move's a group of cards to hand or deck
  * @param  {Array|String}   tohand   an array of cardid's to move from deck to hand. If already in hand, no change
  * @param  {Array|String}   todeck   an array of cardid's to move from hand to deck. If already in deck, no change
  * @param  {Function} callback 
  * @return {undef}            
  */
-User.prototype.moveCards = function(tohand, todeck, callback) {
+// User.prototype.moveCards = function(tohand, todeck, callback) {
 
-    var cardmap = this._createCardIdMap(); //create a lookup map by id for easy searching
+//     var cardmap = this._createCardIdMap(); //create a lookup map by id for easy searching
 
-    for (var i = 0; i < tohand.length; ++i) {
-        //if incoming card id is found as belonging to this user
-        var cardid = tohand[i].trim();
-        if (cardmap[cardid]) {
-            cardmap[cardid].inhand = true;
-        }
-    }
-    for (var i = 0; i < todeck.length; ++i) {
-        //if incoming card id is found as belonging to this user
-        var cardid = todeck[i].trim();
-        if (cardmap[cardid]) {
-            cardmap[cardid].inhand = false;
-        }
-    }
+//     for (var i = 0; i < tohand.length; ++i) {
+//         //if incoming card id is found as belonging to this user
+//         var cardid = tohand[i].trim();
+//         if (cardmap[cardid]) {
+//             cardmap[cardid].inhand = true;
+//         }
+//     }
+//     for (var i = 0; i < todeck.length; ++i) {
+//         //if incoming card id is found as belonging to this user
+//         var cardid = todeck[i].trim();
+//         if (cardmap[cardid]) {
+//             cardmap[cardid].inhand = false;
+//         }
+//     }
 
-    //after all changes are made, wholesale save the cards array back to the data store
-    UserStore.update({_id: this._userid}, { cards: this._cards }, function(err, results) {
-        callback(err, results);
-    });
-};
+//     //after all changes are made, wholesale save the cards array back to the data store
+//     UserStore.update({_id: this._userid}, { cards: this._cards }, function(err, results) {
+//         callback(err, results);
+//     });
+// };
 
 User.prototype.mongoRecord = function(callback) {
 
