@@ -44,30 +44,10 @@ exports.move = function(req, res) {
     var toHand      = (req.body.hand) ? req.body.hand.split(',') : [];
     var toDeck      = (req.body.deck) ? req.body.deck.split(',') : [];
 
-    //parallel allows for multiple functions. we're going to parallel async for setting cards to hand and deck
-    async.parallel([
-        //function one - async each toHand
-        function(callback){
-            async.each(toHand, function(item, next) {
-                user.moveCard(item.trim(), 'hand', function() {
-                    next();
-                });
-            }, function(err) {
-                callback();
-            });
-        },
-        //function two - async each toDeck
-        function(callback){
-            async.each(toDeck, function(item, next) {
-                user.moveCard(item.trim(), 'deck', function() {
-                    next();
-                });
-            }, function(err) {
-                callback();
-            });
-        }
-    ],
-    function(err){
+    //TODO: moving cards should be disallowed while user is engaged in a game
+    
+    user.moveCards(toHand, toDeck, function(err, result) {
+
         if (err) {
             return res.json({
                 success: false,
@@ -76,7 +56,29 @@ exports.move = function(req, res) {
         }
 
         return res.json({
-            success: true
+            success: true,
+            result: result
         });
     });
 };
+
+exports.moveToHand = function(req, res) {
+
+    var user        = new User(req.user);
+    var cardids     = (req.body.cardids) ? req.body.cardids.split(',') : [];
+
+    user.moveCards(cardids, [], function(err, result) {
+
+        if (err) {
+            return res.json({
+                success: false,
+                error: err
+            });
+        }
+
+        return res.json({
+            success: true,
+            result: result
+        });
+    });
+}

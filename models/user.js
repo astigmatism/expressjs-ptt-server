@@ -148,17 +148,34 @@ User.prototype.getCards = function(callback, subset) {
     }); 
 };
 
-User.prototype.moveCard = function(cardid, destination, callback) {
+/**
+ * move's a group of cards to hand or deck
+ * @param  {Array|String}   tohand   an array of cardid's to move from deck to hand. If already in hand, no change
+ * @param  {Array|String}   todeck   an array of cardid's to move from hand to deck. If already in deck, no change
+ * @param  {Function} callback 
+ * @return {undef}            
+ */
+User.prototype.moveCards = function(tohand, todeck, callback) {
 
-    var cardmap = this._createCardIdMap();
+    var cardmap = this._createCardIdMap(); //create a lookup map by id for easy searching
 
-    if (cardmap[cardid]) {
-        if (destination === 'deck') {
+    for (var i = 0; i < tohand.length; ++i) {
+        //if incoming card id is found as belonging to this user
+        var cardid = tohand[i].trim();
+        if (cardmap[cardid]) {
+            cardmap[cardid].inhand = true;
+        }
+    }
+    for (var i = 0; i < todeck.length; ++i) {
+        //if incoming card id is found as belonging to this user
+        var cardid = todeck[i].trim();
+        if (cardmap[cardid]) {
             cardmap[cardid].inhand = false;
         }
     }
 
-    UserStore.update({_userid: this._userid}, { cards: this._cards }, function(err, results) {
+    //after all changes are made, wholesale save the cards array back to the data store
+    UserStore.update({_id: this._userid}, { cards: this._cards }, function(err, results) {
         callback(err, results);
     });
 };

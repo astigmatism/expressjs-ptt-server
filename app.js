@@ -56,6 +56,8 @@ router.route('/cards/deck').get(authController.isAuthenticated, cardsController.
 
 router.route('/cards/move').post(authController.isAuthenticated, cardsController.move);
 
+router.route('/cards/move/hand').post(authController.isAuthenticated, cardsController.moveToHand);
+
 app.use('/', router);
 
 // catch 404 and forward to error handler

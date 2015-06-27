@@ -60,6 +60,7 @@ GET 	cards/												-- returns all user cards
 GET 	cards/hand 											-- returns all user cards currently in hand
 GET 	cards/deck 											-- returns all user cards current NOT in hand (in deck)
 POST 	cards/move 				[hand, deck]				-- moves cards from user's hand to deck or vise-versa. takes comma delimited list of _ids
+POST 	cards/move/hand 		[cardids]					-- given comma delimited array of cardids, moves them into hand
 
 These API's are all consumable from the standpoint of a logged in user. Avoid open endpoints which grant things or cheats.
 I've been using POSTMAN for Google Chrome the most during development but you can also try using CURL from the command line:
@@ -79,7 +80,7 @@ npm install --save async
 npm install -g node-inspector
 npm install --save express-session
 npm install --save mongoose
-npm install merge --save					//for merging objects
+//npm install merge --save					//for merging objects
 
 npm install --save passport
 //npm install --save passport-facebook
@@ -99,6 +100,24 @@ npm install chai --save
 npm install should --save
 
 
+Ideas to implement:
+
+- Campaign mode (1p)
+- Quick Game - maybe just put the user into a game quickly with a set of cards they wont own?
+- Multiplayer - seems like this type should use random cards the users don't actually own, otherwise it could be terribly off-balance. maybe a handicap modifier to make give others stronger decks?
+- 3 or more player on larger grid??
+
+- Campaign mode - divided into "rule worlds" each ending with a "boss" of sorts with a strong deck. A minimum number of game need to be played in that world until the boss is reach but the player can continue to randomly play matches to earn better cards before the boss fight
+- World 1: Basic Rule only. First handful (5?) of games have no win rule then introduce take one.
+- WOrld 2: Same Rule, maybe also same wall at some point?
+- World 3: Plus Rule. Perhaps the bosses can include all previous rules??
+- WOrld 4: Combo
+- World 5: Elemental
+- World 6: Closed
+- World 7: Take Difference
+- World 8: Take All - this should be pretty damn intimidating!!! :)
+
+- 8 worlds is very mario-esc, I like it
 
 Auth:
 
