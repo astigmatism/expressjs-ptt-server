@@ -61,6 +61,7 @@ GET 	cards/hand 											-- returns all user cards currently in hand
 GET 	cards/deck 											-- returns all user cards current NOT in hand (in deck)
 POST 	cards/move 				[hand, deck]				-- moves cards from user's hand to deck or vise-versa. takes comma delimited list of _ids
 POST 	cards/move/hand 		[cardids]					-- given comma delimited array of cardids, moves them into hand
+POST 	game/new 											-- starts a new game
 
 These API's are all consumable from the standpoint of a logged in user. Avoid open endpoints which grant things or cheats.
 I've been using POSTMAN for Google Chrome the most during development but you can also try using CURL from the command line:
