@@ -78,7 +78,7 @@ exports.getFile = function(options) {
  * gets data from NodeCache service
  * @param  {String|Array}   keys     The cache keys
  * @param  {Function} callback The function to return the cached data to
- * @return {Object}            With each key as a key
+ * @return {Object}            
  */
 exports.getCache = getCache = function(keys, callback) {
 
@@ -92,7 +92,14 @@ exports.getCache = getCache = function(keys, callback) {
             callback({});
         } else {
             console.info('NodeCache get success: ' + keys);
-            callback(results);
+            
+            if (keys.length > 1) {
+                callback(results);
+            }
+            //if lookup performed on one key, return result without key
+            else {
+                callback(results[keys[0]]);
+            }
         }
     });
 

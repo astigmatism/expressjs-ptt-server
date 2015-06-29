@@ -1,5 +1,5 @@
 var UserStore = require('../schemas/user');
-var Library = require('../services/library');
+var CardService = require('../services/cards');
 var Utils   = require('../models/utils');
 var async = require('async');
 
@@ -15,6 +15,12 @@ function User(user) {
      * @type {String}
      */
     this._userid     = user._id;
+
+    /**
+     * is admin
+     * @type {Boolean}
+     */
+    this._admin      = user.admin;
 
     /**
      * username
@@ -63,7 +69,7 @@ function User(user) {
 User.create = function(username, password, callback) {
     
     //choose the five cards this user will begin with
-    Library.getRandomCardIdsByLevel([1, 1, 1, 1, 2], function(cardids) {
+    CardService.getRandomCardIdsByLevel([1, 1, 1, 1, 2], function(cardids) {
 
         cards = [];
         for (var i = 0; i < cardids.length; ++i) {
@@ -85,6 +91,26 @@ User.create = function(username, password, callback) {
         });
 
     }, true);
+};
+
+/**
+ * Admin creation routine. NEVER expose this through an api
+ * @param  {String}   username 
+ * @param  {String}   password 
+ * @param  {Function} callback 
+ * @return {undef}            
+ */
+User.createAdmin = function(username, password, callback) {
+
+    var user = new UserStore({
+        username: username,
+        password: password,
+        admin: true
+    });
+
+    user.save(function(err) {
+        callback(err);
+    });
 };
 
 /**
@@ -126,7 +152,7 @@ User.prototype.getCards = function(callback, subset) {
     var result = {};
     var map = this._mapCards();
 
-    Library.getIdDeck(function(library) {
+    CardService.getCardMap('ID', function(library) {
 
         
         if (subset === 'lastUsed') {

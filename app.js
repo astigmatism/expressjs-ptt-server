@@ -8,11 +8,14 @@ var configuration = require('./config.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var data = require('./models/data.js');
-var Library = require('./services/library.js');
+var CardService = require('./services/cards.js');
+var RuleService = require('./services/rules.js');
+var ElementService = require('./services/elements.js');
 
 var authController = require('./controllers/auth');
 var accountController = require('./controllers/account');
 var cardsController = require('./controllers/cards');
+var adminController = require('./controllers/admin');
 
 var app = express();
 
@@ -42,6 +45,8 @@ mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
 // Create our Express router
 var router = express.Router();
 
+
+
 router.route('/account/').get(authController.isAuthenticated, accountController.home);
 
 router.route('/account/').delete(authController.isAuthenticated, accountController.deleteAccount);
@@ -51,6 +56,8 @@ router.route('/account/new').post(accountController.newAccount);
 router.route('/cards/').get(authController.isAuthenticated, cardsController.getAllCards);
 
 router.route('/cards/lastused').get(authController.isAuthenticated, cardsController.getLastUsed);
+
+router.route('/admin/').get(authController.isAuthenticated, adminController.isAdmin);
 
 app.use('/', router);
 
@@ -88,6 +95,9 @@ app.use(function(err, req, res, next) {
 //initialization tasks:
 console.log('environment: ' + app.get('env')); //show env in console for verification
 
-Library.loadLibrary();
+//load data from source and fill cache
+CardService.load();
+RuleService.load();
+ElementService.load();
 
 module.exports = app;

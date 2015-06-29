@@ -1,5 +1,5 @@
 // Load required packages
-var Library = require('../services/library');
+var Library = require('../services/cards');
 var User    = require('../models/user');
 
 // Create endpoint /api/users for POST
@@ -61,7 +61,7 @@ exports.home = function(req, res) {
                 error: err
             });
         }
-        
+
         return res.json({
             success: true,
             userobject: user,

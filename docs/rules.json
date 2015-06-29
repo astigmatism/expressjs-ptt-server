@@ -1,54 +1,69 @@
 {
-    "0": {
-        "name": "Closed",
-        "description": "Players begin the game with their hands face down."
-    },
-    "1": {
-        "name": "Open",
-        "description": "All cards are face up."
-    },
-    "2": {
-        "name": "Same",
-        "description": "Captured if adjacent ranks are equal on 2 or more sides."
-    },
-    "3": {
-        "name": "Plus",
-        "description": "Captured if adjacent ranks sum up to the same value on 2 or more sides."
-    },
-    "4": {
-        "name": "Combo",
-        "description": "Cards captured by Same or Plus subsequently capture adjacent cards with the basic rule."
-    },
-    "5": {
-        "name": "Same Wall",
-        "description": "The edges of the board are counted as A ranks for the purposes of the Same rule."
-    },
-    "6": {
-        "name": "Elemental",
-        "description": "Elements are randomly placed on the board. If a played card matches the element, its ranks are increased by one. If not, they decrease by one."
-    },
-    "7": {
-        "name": "Random",
-        "description": "Both player's start with a random selection of cards from their collections."
-    },
-    "8": {
-        "name": "Sudden Death",
-        "description": "In the case of a draw, the game begins again with each player using the cards they captured in the last round."
-    },
-    "9": {
-        "name": "Take One",
-        "description": "The winner selects one card from their opponent's hand."
-    },
-    "10": {
-        "name": "Take Direct",
-        "description": "Player's keep only the cards they've captured."
-    },
-    "11": {
-        "name": "Take Difference",
-        "description": "Subtract the losing score from the winning score; this is how many cards the winner will take from their opponent's hand."
-    },
-    "12": {
-        "name": "Take All",
-        "description": "The winner takes all cards from their opponent's hand."
-    }
+    "basic": [
+        {
+            "id": 0,
+            "name": "Closed",
+            "description": "Players begin the game with their hands face down."
+        },
+        {
+            "id": 1,
+            "name": "Open",
+            "description": "All cards are face up."
+        },
+        {
+            "id": 2,
+            "name": "Same",
+            "description": "Captured if adjacent ranks are equal on 2 or more sides."
+        },
+        {
+            "id": 3,
+            "name": "Plus",
+            "description": "Captured if adjacent ranks sum up to the same value on 2 or more sides."
+        },
+        {
+            "id": 4,
+            "name": "Combo",
+            "description": "Cards captured by Same or Plus subsequently capture adjacent cards with the basic rule."
+        },
+        {
+            "id": 5,
+            "name": "Same Wall",
+            "description": "The edges of the board are counted as A ranks for the purposes of the Same rule."
+        },
+        {
+            "id": 6,
+            "name": "Elemental",
+            "description": "Elements are randomly placed on the board. If a played card matches the element, its ranks are increased by one. If not, they decrease by one."
+        },
+        {
+            "id": 7,
+            "name": "Random",
+            "description": "Both player's start with a random selection of cards from their collections."
+        },
+        {
+            "id": 8,
+            "name": "Sudden Death",
+            "description": "In the case of a draw, the game begins again with each player using the cards they captured in the last round."
+        },
+        {
+            "id": 9,
+            "name": "Take One",
+            "description": "The winner selects one card from their opponent's hand."
+        },
+        {
+            "id": 10,
+            "name": "Take Direct",
+            "description": "Player's keep only the cards they've captured."
+        },
+        {
+            "id": 11,
+            "name": "Take Difference",
+            "description": "Subtract the losing score from the winning score; this is how many cards the winner will take from their opponent's hand."
+        },
+        {
+            "id": 12,
+            "name": "Take All",
+            "description": "The winner takes all cards from their opponent's hand."
+        }
+    ]
 }

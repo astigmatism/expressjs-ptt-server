@@ -1,15 +1,5 @@
 exports.data = {
 
-	development: {
-		devmode: true,
-		version: '1.0.0',
-		assetpath: '/assets/',
-		sessionsecret: 'iamtheverymodelofamodernmajorgeneral',
-		cookiename: 'puretripletriad',
-		dbname: 'puretripletriad',
-		dbport: '27017',
-		dbhost: 'localhost'
-	},
 	production: {
 		devmode: false,
 		version: '1.0.0',
@@ -18,6 +8,18 @@ exports.data = {
 		cookiename: 'puretripletriad',
 		dbname: 'puretripletriad',
 		dbport: '27017',
-		dbhost: 'localhost'
+		dbhost: 'localhost',
+		adminhash: 'theresnobusinesslikesnowbusiness'
+	},
+	development: {
+		devmode: true,
+		version: '1.0.0',
+		assetpath: '/assets/',
+		sessionsecret: 'iamtheverymodelofamodernmajorgeneral',
+		cookiename: 'puretripletriad',
+		dbname: 'puretripletriad',
+		dbport: '27017',
+		dbhost: 'localhost',
+		adminhash: 'theresnobusinesslikesnowbusiness'
 	}
 }
