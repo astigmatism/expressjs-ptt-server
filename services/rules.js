@@ -59,7 +59,7 @@ RuleService.load = function(callback) {
     });
 };
 
-RuleService.prototype.getRuleMap = function(type, callback) {
+RuleService.getRuleMap = function(type, callback) {
 
 	type = type || RuleService.CACHENAMES.ID;
 

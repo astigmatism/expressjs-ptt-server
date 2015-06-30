@@ -100,7 +100,7 @@ CardService.getRandomCardIdsByLevel = function(level, callback, unique) {
     }
 
     //load card id hash from cache.
-    data.getCache(CardService.CACHENAMES.ID, function(content) {
+    data.getCache(CardService.CACHENAMES.LEVEL, function(content) {
 
         if (content) {
             
@@ -158,8 +158,8 @@ CardService.getCardsById = function (cardIds, callback) {
     
     var results     = {};
 
-    if (!type.is(ids, Array)) {
-        ids = [ids];
+    if (!type.is(cardIds, Array)) {
+        cardIds = [cardIds];
     }
 
     //load card id hash from cache.
@@ -167,11 +167,11 @@ CardService.getCardsById = function (cardIds, callback) {
         if (content) {
             
             var i = 0;
-            for (i; i < ids.length; ++i) {
-                if (content.hasOwnProperty(ids[i])) {
-                    results[ids[i]] = content[ids[i]];
+            for (i; i < cardIds.length; ++i) {
+                if (content.hasOwnProperty(cardIds[i])) {
+                    results[cardIds[i]] = content[cardIds[i]];
                 } else {
-                    results[ids[i]] = null;
+                    results[cardIds[i]] = null;
                 }
             }
             callback(results);
@@ -180,7 +180,7 @@ CardService.getCardsById = function (cardIds, callback) {
         //if not in cache, load from source and try again
         else {
             CardService.load(function() {
-                me.getCardsById(ids, callback);
+                me.getCardsById(cardIds, callback);
             });
         }
     });

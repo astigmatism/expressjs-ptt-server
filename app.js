@@ -12,10 +12,9 @@ var CardService = require('./services/cards.js');
 var RuleService = require('./services/rules.js');
 var ElementService = require('./services/elements.js');
 
-var authController = require('./controllers/auth');
-var accountController = require('./controllers/account');
-var cardsController = require('./controllers/cards');
-var adminController = require('./controllers/admin');
+var AuthenticationController = require('./controllers/authentication');
+var UserController = require('./controllers/user');
+var CardController = require('./controllers/card');
 
 var app = express();
 
@@ -46,18 +45,19 @@ mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
 var router = express.Router();
 
 
+router.route('/user/').delete(AuthenticationController.isAuthenticated, UserController.deleteAccount);
 
-router.route('/account/').get(authController.isAuthenticated, accountController.home);
+router.route('/user/new').post(UserController.newAccount);
 
-router.route('/account/').delete(authController.isAuthenticated, accountController.deleteAccount);
+router.route('/user/:username').get(AuthenticationController.adminLevel1Requied, UserController.viewAccount);
 
-router.route('/account/new').post(accountController.newAccount);
 
-router.route('/cards/').get(authController.isAuthenticated, cardsController.getAllCards);
+router.route('/cards/').get(AuthenticationController.isAuthenticated, CardController.getAllCards);
 
-router.route('/cards/lastused').get(authController.isAuthenticated, cardsController.getLastUsed);
+router.route('/cards/lastused').get(AuthenticationController.isAuthenticated, CardController.getLastUsed);
 
-router.route('/admin/').get(authController.isAuthenticated, adminController.isAdmin);
+router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, UserController.giveRandomLevelCardToUser);
+
 
 app.use('/', router);
 

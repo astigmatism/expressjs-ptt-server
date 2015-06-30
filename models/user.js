@@ -1,5 +1,13 @@
-var UserStore = require('../schemas/user');
+/**
+ * 
+ * User Model Object
+ * This class represents an instance of the "logged in" user - it's an object created on each incoming request once authorization is successful and a user object is returned 
+ * from Mongo. It should only contain operations relevant to the current user. For more general-purchase user-specific functions, see the User Service
+ * 
+ */
+
 var CardService = require('../services/cards');
+var UserServuce = require('../services/users');
 var Utils   = require('../models/utils');
 var async = require('async');
 
@@ -20,7 +28,7 @@ function User(user) {
      * is admin
      * @type {Boolean}
      */
-    this._admin      = user.admin;
+    this._adminlevel = user.adminlevel;
 
     /**
      * username
@@ -60,69 +68,13 @@ function User(user) {
 }
 
 /**
- * User creation, not on prototype
- * @param  {String}   username 
- * @param  {String}   password 
- * @param  {Function} callback
- * @return {undef}
- */
-User.create = function(username, password, callback) {
-    
-    //choose the five cards this user will begin with
-    CardService.getRandomCardIdsByLevel([1, 1, 1, 1, 2], function(cardids) {
-
-        cards = [];
-        for (var i = 0; i < cardids.length; ++i) {
-            cards.push({
-                cardid: cardids[i],
-                lastUsed: true,         //set this to true so that the game understands these are your starting cards for your first game
-                notes: 'Starting Card'
-            });
-        }
-
-        var user = new UserStore({
-            username: username,
-            password: password,
-            cards: cards
-        });
-
-        user.save(function(err) {
-            callback(err);
-        });
-
-    }, true);
-};
-
-/**
- * Admin creation routine. NEVER expose this through an api
- * @param  {String}   username 
- * @param  {String}   password 
- * @param  {Function} callback 
- * @return {undef}            
- */
-User.createAdmin = function(username, password, callback) {
-
-    var user = new UserStore({
-        username: username,
-        password: password,
-        admin: true
-    });
-
-    user.save(function(err) {
-        callback(err);
-    });
-};
-
-/**
  * removes user
  * @param  {Function} callback 
  * @return {undef}            
  */
-User.prototype.remove = function(callback) {
+User.prototype.removeAccount = function(callback) {
 
-    UserStore.remove({ _id: this._userid }, function(err) {
-        callback(err);
-    });
+    UserService.removeAccount(this._userid, callback);
 };
 
 /**
@@ -174,43 +126,12 @@ User.prototype.getCards = function(callback, subset) {
 };
 
 /**
- * DEPRICATED: we no longer use the "inhand" or "indeck" concepts. cards are either "ingame" or not
- * move's a group of cards to hand or deck
- * @param  {Array|String}   tohand   an array of cardid's to move from deck to hand. If already in hand, no change
- * @param  {Array|String}   todeck   an array of cardid's to move from hand to deck. If already in deck, no change
- * @param  {Function} callback 
- * @return {undef}            
+ * Returns whether this user is set to an admin level
+ * @param  {Number}  level 
+ * @return {Boolean}       
  */
-// User.prototype.moveCards = function(tohand, todeck, callback) {
-
-//     var cardmap = this._createCardIdMap(); //create a lookup map by id for easy searching
-
-//     for (var i = 0; i < tohand.length; ++i) {
-//         //if incoming card id is found as belonging to this user
-//         var cardid = tohand[i].trim();
-//         if (cardmap[cardid]) {
-//             cardmap[cardid].inhand = true;
-//         }
-//     }
-//     for (var i = 0; i < todeck.length; ++i) {
-//         //if incoming card id is found as belonging to this user
-//         var cardid = todeck[i].trim();
-//         if (cardmap[cardid]) {
-//             cardmap[cardid].inhand = false;
-//         }
-//     }
-
-//     //after all changes are made, wholesale save the cards array back to the data store
-//     UserStore.update({_id: this._userid}, { cards: this._cards }, function(err, results) {
-//         callback(err, results);
-//     });
-// };
-
-User.prototype.mongoRecord = function(callback) {
-
-    UserStore.find({_id: this._userid }, function(err, result) {
-        callback(err, result);
-    });
+User.prototype.getAdminLevel = function() {
+    return this._adminlevel;
 };
 
 module.exports = User;

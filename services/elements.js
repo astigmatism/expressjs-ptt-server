@@ -59,7 +59,7 @@ ElementService.load = function(callback) {
     });
 };
 
-ElementService.prototype.getElementMap = function(type, callback) {
+ElementService.getElementMap = function(type, callback) {
 
 	type = type || ElementService.CACHENAMES.ID;
 

@@ -2,7 +2,16 @@
 var User    = require('../models/user');
 var async = require('async');
 
-exports.getAllCards = function(req, res) {
+CardController = function() {
+
+};
+
+//ADMIN API's
+
+
+//AUTHENTICATED API's
+
+CardController.getAllCards = function(req, res) {
     
     var user = new User(req.user);
 
@@ -21,7 +30,7 @@ exports.getAllCards = function(req, res) {
     });
 };
 
-exports.getLastUsed = function(req, res) {
+CardController.getLastUsed = function(req, res) {
 
     var user = new User(req.user);
 
@@ -39,6 +48,8 @@ exports.getLastUsed = function(req, res) {
         });
     }, 'lastUsed');
 };
+
+module.exports = CardController;
 
 //DEPRICATED: the concept of moving cards from "hand" to "deck" is no longer used. cards are "ingame" or not
 
