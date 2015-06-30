@@ -1,3 +1,10 @@
+/**
+ *
+ * The User Controller acts as a delegate all incoming requests and outgoing responses as it relates to functionality associated with 
+ * user's in general. This functionality differs from the User Model which is an instance of a user object from the mongo db.
+ * 
+ */
+
 var User            = require('../models/user');
 var UserService     = require('../services/users');
 

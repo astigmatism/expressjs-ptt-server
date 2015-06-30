@@ -8,6 +8,7 @@ var configuration = require('./config.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var data = require('./models/data.js');
+
 var CardService = require('./services/cards.js');
 var RuleService = require('./services/rules.js');
 var ElementService = require('./services/elements.js');

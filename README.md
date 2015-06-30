@@ -48,24 +48,9 @@ Consistancy in response rules:
 - All response objects include a boolean property called "success"
 
 
-
-List of API's:
-
-
-POST 	user/new	  	 		[username, password]		-- no auth needed, creates a user given a username and password
-GET 	user/:id											-- returns something about the logged in user 
-DELETE	user/												-- deletes your account
-
-GET 	cards/												-- returns all user cards
-POST 	cards/givelevel			[userid, level]				-- gives a random card in the level to that user (level 10 required)
-
-
-
 These API's are all consumable from the standpoint of a logged in user. Avoid open endpoints which grant things or cheats.
 I've been using POSTMAN for Google Chrome the most during development but you can also try using CURL from the command line:
 curl -u username:password -X GET localhost:3000/user
-
-
 
 
 npm install list (for dev)

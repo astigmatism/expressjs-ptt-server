@@ -1,0 +1,65 @@
+{
+	"0": {
+		"name": "original",
+		"notes": "3x3 grid",
+		"maxplayers": 2,
+		"minplayers": 2,
+		"cardsperplayer": 5,
+		"boardmap": [
+			{
+				"n": null,
+				"e": 1,
+				"s": 3,
+				"w": null
+			},
+			{
+				"n": null,
+				"e": 2,
+				"s": 4,
+				"w": 0
+			},
+			{
+				"n": null,
+				"e": null,
+				"s": 5,
+				"w": 1
+			},
+			{
+				"n": 0,
+				"e": 4,
+				"s": 6,
+				"w": null
+			},
+			{
+				"n": 1,
+				"e": 5,
+				"s": 7,
+				"w": 3
+			},
+			{
+				"n": 2,
+				"e": null,
+				"s": 8,
+				"w": 4
+			},
+			{
+				"n": 3,
+				"e": 7,
+				"s": null,
+				"w": null
+			},
+			{
+				"n": 4,
+				"e": 8,
+				"s": null,
+				"w": 6
+			},
+			{
+				"n": 5,
+				"e": null,
+				"s": null,
+				"w": 7
+			}
+		]
+	}
+}
