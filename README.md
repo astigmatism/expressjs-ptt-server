@@ -39,6 +39,14 @@ For development, consider these additional steps after step 4 from above:
 9) Run the app: DEBUG=expressjs-ptt-server ./bin/www
 
 
+Design Notes:
+
+Controllers: Controllers are specifically concerned with interpreting, validating and formatting the request and response objects.
+Models:
+Schemas:
+Services:
+
+
 Consistancy in response rules:
 
 - POST everything as "x-www-form-urlencoded"
@@ -76,7 +84,7 @@ npm install --save passport-http
 npm install --save connect-mongo
 npm install --save bcrypt-nodejs
 
-
+npm install node-uuid --save		
 Unit testing stuff, not used yet.
 
 npm install mocha --save

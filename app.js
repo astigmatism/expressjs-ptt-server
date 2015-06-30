@@ -45,35 +45,47 @@ mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
 // Create our Express router
 var router = express.Router();
 
+//NO AUTH
 
-router.route('/user/').delete(AuthenticationController.isAuthenticated, UserController.deleteAccount);
+router.route('/user/new').post(UserController.createAccount);
 
-router.route('/user/new').post(UserController.newAccount);
+router.route('/user/verify/:token').get(UserController.tokenVerification);
+
+//AUTH
+
+router.route('/user/').delete(AuthenticationController.isAuthenticated, UserController.removeAccount);
+
+//AUTH AND VERIFIED
+
+router.route('/cards/').get(AuthenticationController.isAuthenticatedAndVerified, CardController.getAllCards);
+
+router.route('/cards/lastused').get(AuthenticationController.isAuthenticatedAndVerified, CardController.getLastUsed);
+
+//ADMIN LEVEL 1
 
 router.route('/user/:username').get(AuthenticationController.adminLevel1Requied, UserController.viewAccount);
 
-
-router.route('/cards/').get(AuthenticationController.isAuthenticated, CardController.getAllCards);
-
-router.route('/cards/lastused').get(AuthenticationController.isAuthenticated, CardController.getLastUsed);
+//ADMIN LEVEL 10
 
 router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, UserController.giveRandomLevelCardToUser);
 
 
 app.use('/', router);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
 // error handlers
 
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
+
+    //404
+    app.use(function(req, res, next) {
+        var err = new Error('Not Found');
+        err.status = 404;
+        next(err);
+    });
+
+    //500
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
@@ -81,17 +93,23 @@ if (app.get('env') === 'development') {
             error: err
         });
     });
-}
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
+} else {
+
+    app.use(function(req, res, next) {
+        var err     = new Error('Not Found');
+        err.status  = 404;
+        next();
     });
-});
+
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: {}
+        });
+    });
+}
 
 //initialization tasks:
 console.log('environment: ' + app.get('env')); //show env in console for verification

@@ -5,6 +5,10 @@ var bcrypt = require('bcrypt-nodejs');
 // Define our user schema
 var UserSchema = new mongoose.Schema({
     
+    /**
+     * The username for the player, will be unique
+     * @type {Object}
+     */
     username: {
         type: String,
         unique: true,
@@ -14,6 +18,29 @@ var UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+
+    email: {
+        type: String,
+        required: true
+    },
+
+    /**
+     * Has this user validated their email address by following the verification link?
+     * @type {Boolean}
+     */
+    verified: {
+        type: Boolean,
+        default: false
+    },
+
+    /**
+     * The date this account was created
+     * @type {Date}
+     */
+    created: {
+        type: Date,
+        default: Date.now
     },
 
     /**
@@ -64,7 +91,7 @@ var UserSchema = new mongoose.Schema({
             //the date obtained
             obtained: {
                 type: Date,         
-                default: Date()
+                default: Date.now
             },
             //the game id (in mongo) for the game this card is currently participating in. empty string for no game
             ingame: {
@@ -120,6 +147,10 @@ UserSchema.methods.verifyPassword = function(password, callback) {
         }
         callback(null, isMatch);
     });
+};
+
+UserSchema.methods.isVerified = function() {
+    return this.verified;
 };
 
 // Export the Mongoose model
