@@ -60,7 +60,7 @@ passport.use('verified', new BasicStrategy(
                     return callback(null, false); 
                 }
 
-                if (!user.isValidated) {
+                if (!user.isVerified()) {
                     return callback(null, false);   
                 }
 
@@ -97,7 +97,7 @@ passport.use('admin', new BasicStrategy({
                     return callback(null, false);
                 }
 
-                if (!user.isValidated) {
+                if (!user.isVerified()) {
                     return callback(null, false);
                 }
 

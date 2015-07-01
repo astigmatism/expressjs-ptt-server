@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 var configuration = require('./config.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var data = require('./models/data.js');
 
 var CardService = require('./services/cards.js');
 var RuleService = require('./services/rules.js');
@@ -67,7 +66,7 @@ router.route('/user/:username').get(AuthenticationController.adminLevel1Requied,
 
 //ADMIN LEVEL 10
 
-router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, UserController.giveRandomLevelCardToUser);
+router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, CardController.giveRandomLevelCardToUser);
 
 
 app.use('/', router);

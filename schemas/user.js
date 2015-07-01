@@ -87,7 +87,10 @@ var UserSchema = new mongoose.Schema({
     cards: [
         {
             //_id                   //the unique if this card in mongo, use for db CRUD
-            cardid: Number,         //the card id which maps to the card library
+            cardid: {
+                type: Number,         //the card id which maps to the card library
+                required: true
+            },
             //the date obtained
             obtained: {
                 type: Date,         
@@ -98,7 +101,10 @@ var UserSchema = new mongoose.Schema({
                 type: String,
                 default: ''
             },
-            notes: String,          //any notes about the card itself, usually obtain information (like from a game, etc)
+            notes: {
+                type: String,          //any notes about the card itself, usually obtain information (like from a game, etc)
+                default: ''
+            },
             //a sum of the number of captures this card has been responsible for ;)
             captures: {
                 type: Number,

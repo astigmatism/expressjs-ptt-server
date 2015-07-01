@@ -1,5 +1,6 @@
 var config = require('../config.js');
-var data = require('../models/data.js');
+
+var DataService = require('../services/data.js');
 
 ElementService = function() {
 
@@ -15,48 +16,49 @@ ElementService.load = function(callback) {
 	var byid 	= {};
 	var byname 	= {};
 
-	data.getFile({
-        path:       '/docs/elements.json',
-        forceLoad:  true,
-        onSuccess:  function(content) {
+    DataService.getFile('/docs/elements.json', function(err, content) {
 
-            if(!content.hasOwnProperty('basic')) {
-                throw new Error('elements.json does not have a "basic" element set');
+        //throw hard exceptions when we cannot retrieve the card data from its source, the application cannot function any further
+        
+        if (err) {
+            throw new Error(err);
+        }
+
+        if(!content.hasOwnProperty('basic')) {
+            throw new Error('elements.json does not have a "basic" element set');
+        }
+
+        for (var i = 0; i < content.basic.length; ++i) {
+
+            var item = content.basic[i];
+
+            //check for valid structure
+            if (!item.hasOwnProperty('id') || !item.hasOwnProperty('name')) {
+                throw new Error ('The cards.json document is not formed properly with all required card properties.');
             }
 
-            for (var i = 0; i < content.basic.length; ++i) {
+            byid[item.id] = item;
+            byname[item.name] = item;
+        };
 
-                var item = content.basic[i];
+        DataService.setCache([
+            {
+                key: ElementService.CACHENAMES.ID,
+                content: byid
+            },
+            {
+                key: ElementService.CACHENAMES.NAME,
+                content: byname
+            }
+        ],
+        function() {
+            if (callback) {
+                callback();
+            }
+            return;
+        });
 
-                //check for valid structure
-                if (!item.hasOwnProperty('id') || !item.hasOwnProperty('name')) {
-                    throw new Error ('The cards.json document is not formed properly with all required card properties.');
-                }
-
-                byid[item.id] = item;
-                byname[item.name] = item;
-            };
-
-            data.setCache({
-                items: [
-                    {
-                        key: ElementService.CACHENAMES.ID,
-                        content: byid
-                    },
-                    {
-                        key: ElementService.CACHENAMES.NAME,
-                        content: byname
-                    }
-                ],
-                callback: function() {
-                    if (callback) callback();
-                }
-            });
-        },
-        onError: function(error) {
-            throw new Error(error);     //throw hard exception when we cannot retrieve the card data from its source, the application cannot function any further
-        }
-    });
+    }, true);
 };
 
 ElementService.getElementMap = function(type, callback) {

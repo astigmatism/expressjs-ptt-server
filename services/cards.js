@@ -1,10 +1,12 @@
 var config = require('../config.js');
-var data = require('../models/data.js');
 var type = require('type-of-is');
 var utils = require('../models/utils');
 
-CardService = function() {
+var DataService = require('../services/data.js');
+var UserService = require('../services/users.js');
 
+CardService = function() {
+    
 };
 
 CardService.CACHENAMES = {
@@ -21,86 +23,87 @@ CardService.load = function(callback) {
 	var bylevel = {};
 	var bystren = {};
 
-	data.getFile({
-        path:       '/docs/cards.json',
-        forceLoad:  true,
-        onSuccess:  function(content) {
+	DataService.getFile('/docs/cards.json', function(err, content) {
 
-        	if(!content.hasOwnProperty('basic')) {
-        		throw new Error('cards.json does not have a "basic" card set');
-        	}
+        //throw hard exceptions when we cannot retrieve the card data from its source, the application cannot function any further
+        
+        if (err) {
+            throw new Error(err);
+        }
 
-        	for (var i = 0; i < content.basic.length; ++i) {
+        if(!content.hasOwnProperty('basic')) {
+            throw new Error('cards.json does not have a "basic" card set');
+        }
 
-        		var item = content.basic[i];
+        for (var i = 0; i < content.basic.length; ++i) {
 
-        		//check for valid structure
-        		if (!item.hasOwnProperty('id') || !item.hasOwnProperty('name') || !item.hasOwnProperty('level') || !item.hasOwnProperty('strength')) {
-        			throw new Error ('The cards.json document is not formed properly with all required card properties.');
-        		}
+            var item = content.basic[i];
 
-        		byid[item.id] = item;
-        		byname[item.name] = item;
-            	
-            	if (!type.is(bylevel[item.level], Array)) {
-                    bylevel[item.level] = [];
-                }
-                bylevel[item.level].push(item);
-
-                if (!type.is(bystren[item.strength], Array)) {
-                    bystren[item.strength] = [];
-                }
-                bystren[item.strength].push(item);
+            //check for valid structure
+            if (!item.hasOwnProperty('id') || !item.hasOwnProperty('name') || !item.hasOwnProperty('level') || !item.hasOwnProperty('strength')) {
+                throw new Error ('The cards.json document is not formed properly with all required card properties.');
             }
 
-            data.setCache({
-                items: [
-                    {
-                        key: CardService.CACHENAMES.ID,
-                        content: byid
-                    },
-                    {
-                        key: CardService.CACHENAMES.NAME,
-                        content: byname
-                    },
-                    {
-                        key: CardService.CACHENAMES.STRENGTH,
-                        content: bystren
-                    },
-                    {
-                        key: CardService.CACHENAMES.LEVEL,
-                        content: bylevel
-                    }
-                ],
-                callback: function() {
-                    if (callback) callback();
-                }
-            });
-        },
-        onError: function(error) {
-            throw new Error(error);     //throw hard exception when we cannot retrieve the card data from its source, the application cannot function any further
+            byid[item.id] = item;
+            byname[item.name] = item;
+            
+            if (!type.is(bylevel[item.level], Array)) {
+                bylevel[item.level] = [];
+            }
+            bylevel[item.level].push(item);
+
+            if (!type.is(bystren[item.strength], Array)) {
+                bystren[item.strength] = [];
+            }
+            bystren[item.strength].push(item);
         }
-    });
+
+        DataService.setCache([
+            {
+                key: CardService.CACHENAMES.ID,
+                content: byid
+            },
+            {
+                key: CardService.CACHENAMES.NAME,
+                content: byname
+            },
+            {
+                key: CardService.CACHENAMES.STRENGTH,
+                content: bystren
+            },
+            {
+                key: CardService.CACHENAMES.LEVEL,
+                content: bylevel
+            }
+        ],
+        function() {
+            if (callback) {
+                callback();
+            }
+            return;
+        });
+
+    }, true);
 };
 
 /**
- * get a random card or set of cards given 
- * @param  {[type]}   level    [description]
- * @param  {Function} callback [description]
- * @param  {[type]}   unique   [description]
+ * Get a random card within a level from the set
+ * @param  {Number}   level    
+ * @param  {Function} callback 
+ * @param  {Boolean}   unique   optional. default: false. specifies random with replacement (false) or not (true)
  * @return {[type]}            [description]
  */
-CardService.getRandomCardIdsByLevel = function(level, callback, unique) {
+CardService.getRandomCardIdsByLevel = function(level, callback, opt_unique) {
 	
     var results = [];
-    unique      = unique || false;
+    opt_unique      = opt_unique || false;
 
     if (!type.is(level, Array)) {
         level = [level];
     }
 
     //load card id hash from cache.
-    data.getCache(CardService.CACHENAMES.LEVEL, function(content) {
+    DataService.getCache(CardService.CACHENAMES.LEVEL, function(content) {
 
         if (content) {
             
@@ -113,7 +116,7 @@ CardService.getRandomCardIdsByLevel = function(level, callback, unique) {
                 var cardsinlevel = content[currentlevel];
 
                 //if unique results only, lets copy all the cards of this level and put them in the cardsByLevelPop object so we can random without replacement
-                if (unique) {
+                if (opt_unique) {
 
                     //build array if doesnt exist
                     if (!type.is(cardsbylevelpopped[currentlevel], Array)) {
@@ -142,62 +145,68 @@ CardService.getRandomCardIdsByLevel = function(level, callback, unique) {
                 }
 
             }
-            callback(results);
-            return;
+            return callback(null, results);
         } 
         //if not in cache, load from source and try again
         else {
             CardService.load(function() {
-                me.getRandomCardIdsByLevel(level, callback, unique);
+                me.getRandomCardIdsByLevel(level, callback, opt_unique);
             });
         }
     });
 };
 
-CardService.getCardsById = function (cardIds, callback) {
-    
-    var results     = {};
-
-    if (!type.is(cardIds, Array)) {
-        cardIds = [cardIds];
-    }
-
-    //load card id hash from cache.
-    data.getCache(CardService.CACHENAMES.ID, function(content) {
-        if (content) {
-            
-            var i = 0;
-            for (i; i < cardIds.length; ++i) {
-                if (content.hasOwnProperty(cardIds[i])) {
-                    results[cardIds[i]] = content[cardIds[i]];
-                } else {
-                    results[cardIds[i]] = null;
-                }
-            }
-            callback(results);
-            return;
-        } 
-        //if not in cache, load from source and try again
-        else {
-            CardService.load(function() {
-                me.getCardsById(cardIds, callback);
-            });
-        }
-    });
-    
-};
-
+/**
+ * Returns one of the card maps in cache for easy lookup without iteration. default returned is ID map
+ * @param  {String}   type     ID|NAME|LEVEL|STRENGTH
+ * @param  {Function} callback 
+ * @return {Function}            returns null if not found in cache
+ */
 CardService.getCardMap = function(type, callback) {
 
 	type = type || CardService.CACHENAMES.ID;
 
-	data.getCache(CardService.CACHENAMES[type], function(content) {
-        if (content) {
-        	callback(content);
-        	return;
+	DataService.getCache(CardService.CACHENAMES[type], function(content) {
+        if (!content) {
+        	CardService.load(function() {
+                CardService.getCardMap(type, callback);
+            });
+            return;
         }
-        callback(null);
+        return callback(content);
     });
+};
+
+CardService.giveRandomLevelCardsToUser = function(userid, levels, notes, callback, opt_unique) {
+
+    opt_unique = opt_unique || true; //card selections be unique from one another
+
+    if (!type.is(levels, Array)) {
+        levels = [levels];
+    }
+
+    CardService.getRandomCardIdsByLevel(levels, function(err, cardids) {
+
+        if (err) {
+            return callback(err);
+        }
+
+        var manifest = [];
+        for (var i = 0; i < cardids.length; ++i) {
+            manifest.push({
+                cardid: cardids[i],
+                notes: notes
+            }); 
+        }
+        UserService.giveCardsToUser(userid, manifest, function (err) {
+
+            if (err) {
+                return callback(err);
+            }
+            return callback();
+        });
+
+    }, opt_unique);
 };
 
 

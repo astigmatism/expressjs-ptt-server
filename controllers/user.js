@@ -44,29 +44,6 @@ UserController.viewAccount = function(req, res) {
     
 };
 
-UserController.giveRandomLevelCardToUser = function(req, res) {
-
-    var userid  = req.body.userid; 
-    var level   = req.body.level;
-
-    if (!level) {
-        return res.json({
-            success: false,
-            error: {
-                message: 'level param required in postdata'
-            }
-        }); 
-    }
-
-    UserService.giveRandomLevelCardToUser(userid, level, function (err) {
-
-        return res.json({
-            success: true,
-            card: card
-        });
-    });
-};
-
 //AUTHENICATED USER API's
 
 UserController.removeAccount = function(req, res) {
