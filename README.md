@@ -41,55 +41,31 @@ For development, consider these additional steps after step 4 from above:
 
 Design Notes:
 
-Controllers: Controllers are specifically concerned with interpreting, validating and formatting the request and response objects.
-Models:
+Controllers: Controllers are specifically concerned with interpreting, validating and formatting the request objects, passing parameters to Services and then correctly formatting the response object in a consistent manner
+Models: Models are, as usual, data model objects which are instanced by the application. 
 Schemas:
-Services:
+Services: Services provide the grunt work of the application. Any functionality bound to a schema is represented in its corresponding Service. 
 
 
 Consistancy in response rules:
 
-- POST everything as "x-www-form-urlencoded"
+- For all POST, send everything in body as "x-www-form-urlencoded"
 - All unsupported api's return 404
 - All supported api's return 200
 - All responses in json format
-- All response objects include a boolean property called "success"
-
-
-These API's are all consumable from the standpoint of a logged in user. Avoid open endpoints which grant things or cheats.
-I've been using POSTMAN for Google Chrome the most during development but you can also try using CURL from the command line:
-curl -u username:password -X GET localhost:3000/user
-
-
-npm install list (for dev)
-
-npm install --save jade
-npm install --save node-cache
-npm install --save mongodb
-npm install --save monk
-npm install --save type-of-is
-npm install --save async
-npm install -g node-inspector
-npm install --save express-session
-npm install --save mongoose
-//npm install merge --save					//for merging objects
-
-npm install --save passport
-//npm install --save passport-facebook
-//npm install --save passport-twitter
-//npm install --save passport-google
-//npm install --save passport-local
-npm install --save passport-http
-//npm install --save passport-local-mongoose
-npm install --save connect-mongo
-npm install --save bcrypt-nodejs
-
-npm install node-uuid --save		
-Unit testing stuff, not used yet.
-
-npm install mocha --save
-npm install chai --save
-npm install should --save
+- Successful response object:
+{
+	"success": true,
+	...
+}
+- Unsuccessful response object:
+{
+	"success": false,
+	"error": {
+		"message": ...
+		...
+	}
+}
 
 
 Ideas to implement:

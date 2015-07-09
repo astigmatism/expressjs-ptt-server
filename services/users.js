@@ -1,12 +1,11 @@
 var type = require('type-of-is');
 var async = require('async');
 
-var CardService = require('../services/cards');
+var CardService = require('./cards');
 var UserStore = require('../schemas/user');
 var VerificationStore = require('../schemas/verification');
 
 UserService = function() {
-
 };
 
 UserService.createAccount = function(username, password, email, callback) {
@@ -47,14 +46,30 @@ UserService.removeAccount = function(userid, callback) {
 UserService.getUserById = function(userid, callback) {
 
 	UserStore.find({_id: userid }, function(err, result) {
-        return callback(err, result);
+        
+        if (err) {
+            return callback(err);
+        }
+
+        if (result && result[0]) {
+            return callback(err, result[0]);
+        }
+        return callback('userid ' + userid + ' not found', null);
     });
 };
 
 UserService.getUserByName = function(username, callback) {
 
 	UserStore.find({username: username }, function(err, result) {
-        return callback(err, result);
+
+        if (err) {
+            return callback(err);
+        }
+
+        if (result && result[0]) {
+            return callback(err, result[0]);
+        }
+        return callback('username ' + username + ' not found', null);
     });
 };
 
@@ -63,8 +78,6 @@ UserService.giveCardsToUser = function(userid, manifest, callback) {
     if (!type.is(manifest, Array)) {
         manifest = [manifest];
     }
-
-    console.log(CardService);
 
     //for each card in the manifest
     async.eachSeries(manifest, function(item, next) {
@@ -75,8 +88,6 @@ UserService.giveCardsToUser = function(userid, manifest, callback) {
                 message: 'missing parameters for cardid'
             }); 
         }
-
-        console.log(CardService);
 
         //ensure the cardid exists in the cardid map (checking a valid cardid)
         CardService.getCardMap('ID', function (map) {
@@ -89,8 +100,14 @@ UserService.giveCardsToUser = function(userid, manifest, callback) {
 
             UserStore.findOne({_id: userid}, function (err, user) {
 
+                if (!user) {
+                    return next({
+                        message: 'user not found'
+                    });
+                }
+
                 if (err) {
-                    next(err);
+                    return next(err);
                 }
 
                 //add the card to the user's inventory
@@ -99,9 +116,9 @@ UserService.giveCardsToUser = function(userid, manifest, callback) {
                 user.save(function (err) {
 
                     if (err) {
-                        next(err);
+                        return next(err);
                     }
-                    next();
+                    return next();
                 });
             });
 
@@ -110,6 +127,39 @@ UserService.giveCardsToUser = function(userid, manifest, callback) {
     function(err) {
         return callback(err);
     });
+};
+
+UserService.giveRandomLevelCardsToUser = function(userid, levels, notes, callback, opt_unique) {
+
+    opt_unique = opt_unique || true; //card selections be unique from one another
+
+    if (!type.is(levels, Array)) {
+        levels = [levels];
+    }
+
+    CardService.getRandomCardIdsByLevel(levels, function(err, cardids) {
+
+        if (err) {
+            return callback(err, null);
+        }
+
+        var manifest = [];
+        for (var i = 0; i < cardids.length; ++i) {
+            manifest.push({
+                cardid: cardids[i],
+                notes: notes
+            }); 
+        }
+
+        UserService.giveCardsToUser(userid, manifest, function (err) {
+
+            if (err) {
+                return callback(err, null);
+            }
+            return callback(null, cardids);
+        });
+
+    }, opt_unique);
 };
 
 UserService.tokenVerification = function(token, callback) {

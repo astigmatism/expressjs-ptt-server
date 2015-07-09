@@ -3,10 +3,8 @@ var type = require('type-of-is');
 var utils = require('../models/utils');
 
 var DataService = require('../services/data.js');
-var UserService = require('../services/users.js');
 
 CardService = function() {
-    
 };
 
 CardService.CACHENAMES = {
@@ -113,6 +111,10 @@ CardService.getRandomCardIdsByLevel = function(level, callback, opt_unique) {
             for (i; i < level.length; ++i) {
                 
                 var currentlevel = String(level[i]);
+
+                if (!content.hasOwnProperty(currentlevel)) {
+                    return callback('No cards found for this level', null);
+                }
                 var cardsinlevel = content[currentlevel];
 
                 //if unique results only, lets copy all the cards of this level and put them in the cardsByLevelPop object so we can random without replacement
@@ -175,38 +177,6 @@ CardService.getCardMap = function(type, callback) {
         }
         return callback(content);
     });
-};
-
-CardService.giveRandomLevelCardsToUser = function(userid, levels, notes, callback, opt_unique) {
-
-    opt_unique = opt_unique || true; //card selections be unique from one another
-
-    if (!type.is(levels, Array)) {
-        levels = [levels];
-    }
-
-    CardService.getRandomCardIdsByLevel(levels, function(err, cardids) {
-
-        if (err) {
-            return callback(err);
-        }
-
-        var manifest = [];
-        for (var i = 0; i < cardids.length; ++i) {
-            manifest.push({
-                cardid: cardids[i],
-                notes: notes
-            }); 
-        }
-        UserService.giveCardsToUser(userid, manifest, function (err) {
-
-            if (err) {
-                return callback(err);
-            }
-            return callback();
-        });
-
-    }, opt_unique);
 };
 
 

@@ -14,7 +14,6 @@ var ElementService = require('./services/elements.js');
 
 var AuthenticationController = require('./controllers/authentication');
 var UserController = require('./controllers/user');
-var CardController = require('./controllers/card');
 
 var app = express();
 
@@ -56,17 +55,17 @@ router.route('/user/').delete(AuthenticationController.isAuthenticated, UserCont
 
 //AUTH AND VERIFIED
 
-router.route('/cards/').get(AuthenticationController.isAuthenticatedAndVerified, CardController.getAllCards);
+router.route('/cards/').get(AuthenticationController.isAuthenticatedAndVerified, UserController.getCards);
 
-router.route('/cards/lastused').get(AuthenticationController.isAuthenticatedAndVerified, CardController.getLastUsed);
+router.route('/cards/lastused').get(AuthenticationController.isAuthenticatedAndVerified, UserController.getLastUsed);
 
 //ADMIN LEVEL 1
 
-router.route('/user/:username').get(AuthenticationController.adminLevel1Requied, UserController.viewAccount);
+router.route('/user/:username').get(AuthenticationController.adminLevel1Requied, UserController.getUser);
 
 //ADMIN LEVEL 10
 
-router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, CardController.giveRandomLevelCardToUser);
+router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, UserController.giveRandomLevelCardToUser);
 
 
 app.use('/', router);
