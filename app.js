@@ -4,16 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var configuration = require('./config.js');
+var configuration = require('./src/js/config.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
 
-var CardService = require('./services/cards.js');
-var RuleService = require('./services/rules.js');
-var ElementService = require('./services/elements.js');
+var CardService = require('./src/js/services/cards.js');
+var RuleService = require('./src/js/services/rules.js');
+var ElementService = require('./src/js/services/elements.js');
 
-var AuthenticationController = require('./controllers/authentication');
-var UserController = require('./controllers/user');
+var AuthenticationController = require('./src/js/controllers/authentication');
+var UserController = require('./src/js/controllers/user');
 
 var app = express();
 

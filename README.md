@@ -24,7 +24,9 @@ These instruction were written for OSX. I both develop and serve apps with it :)
 
 8) Run the app: DEBUG=expressjs-ptt-server ./bin/www
 
+Gulp Builds:
 
+the main build file is "gulpfile.js" and defines all the tests to run. Run at command line with "gulp". This runs the default task and any watchers. I added a watcher for all js files to lint them when they change. Very useful during development.
 
 For development, consider these additional steps after step 4 from above:
 

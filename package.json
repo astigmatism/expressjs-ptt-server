@@ -6,6 +6,7 @@
     "start": "node ./bin/www",
     "test": "make test"
   },
+  "jshintConfig": {},
   "dependencies": {
     "async": "^0.9.2",
     "bcrypt-nodejs": "0.0.3",
@@ -35,5 +36,11 @@
     "serve-favicon": "~2.2.0",
     "should": "^6.0.1",
     "type-of-is": "^3.4.0"
+  },
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^1.11.2",
+    "jshint-stylish": "^2.0.1"
   }
 }
