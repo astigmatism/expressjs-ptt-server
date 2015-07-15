@@ -1,0 +1,13 @@
+{
+  "preset": "google",
+  "disallowTrailingWhitespace": true,
+  "excludeFiles": [
+  ],
+  "validateIndentation": 4,
+  "maximumLineLength": {
+    "value": 500,
+    "tabSize": 4,
+    "allowUrlComments": true,
+    "allowRegex": true
+  }
+}

@@ -8,14 +8,10 @@ var configuration = require('./src/js/config.js');
 var mongoose = require('mongoose');
 var passport = require('passport');
 
-var CardService = require('./src/js/services/cards.js');
-var RuleService = require('./src/js/services/rules.js');
-var ElementService = require('./src/js/services/elements.js');
-
-var AuthenticationController = require('./src/js/controllers/authentication');
-var UserController = require('./src/js/controllers/user');
-
 var app = express();
+
+//setup routes
+require('./src/js/router.js')(app);
 
 //pull in app configuration
 config = configuration.data.production;
@@ -33,42 +29,14 @@ app.set('view engine', 'jade');
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 
 mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
-
-// Create our Express router
-var router = express.Router();
-
-//NO AUTH
-
-router.route('/user/new').post(UserController.createAccount);
-
-router.route('/user/verify/:token').get(UserController.tokenVerification);
-
-//AUTH
-
-router.route('/user/').delete(AuthenticationController.isAuthenticated, UserController.removeAccount);
-
-//AUTH AND VERIFIED
-
-router.route('/cards/').get(AuthenticationController.isAuthenticatedAndVerified, UserController.getCards);
-
-router.route('/cards/lastused').get(AuthenticationController.isAuthenticatedAndVerified, UserController.getLastUsed);
-
-//ADMIN LEVEL 1
-
-router.route('/user/:username').get(AuthenticationController.adminLevel1Requied, UserController.getUser);
-
-//ADMIN LEVEL 10
-
-router.route('/cards/givelevel').post(AuthenticationController.adminLevel10Requied, UserController.giveRandomLevelCardToUser);
-
-
-app.use('/', router);
 
 // error handlers
 
