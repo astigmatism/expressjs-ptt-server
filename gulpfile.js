@@ -9,22 +9,22 @@ var nodeNotifier = require('node-notifier');
 var jscs = require('gulp-jscs');
 var runSequence = require('run-sequence');
 
-var jshintConfig = packageJSON.jshintConfig;
+var jshintConfig = {};
 
-var js_src = ['./src/**/*.js', './app.js']
+var paths = ['./src/**/*.js', './app.js']
 
 
-var watcher = gulp.watch(js_src, ['watch']);
+var watcher = gulp.watch(paths, ['watch']);
 
+watcher.on('change', function(event) {
+    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+    paths = event.path;
+});
 
 
 gulp.task('default', function() {
-  	
-  	runSequence('jscsfixjustwhitespace', 'lint', 'jscs', function() {
-		console.log('Success!'.green);
-		return true;
+  runSequence('jscsfixjustwhitespace', 'lint', 'jscs', function() {
 	});
-  	return false;
 });
 
 
@@ -37,7 +37,7 @@ gulp.task('watch', function() {
 
 
 gulp.task('jscs', function() {
-  return gulp.src(js_src)
+  return gulp.src(paths)
     .pipe(jscs());
 });
 
@@ -48,8 +48,7 @@ function jscsErrorHandler(error) {
 
 gulp.task('jscsfixjustwhitespace', function() {
 	// See here for why I specified a base: http://stackoverflow.com/a/24412960/3595355
-  	//return gulp.src(js_src, {base: './'})
-  	return gulp.src(js_src)
+  	return gulp.src(paths, {base: './'})  	
     .pipe(jscs({
         fix: true,
         // The following won't work until the issue is fixed on github.
@@ -65,7 +64,7 @@ gulp.task('jscsfixjustwhitespace', function() {
 gulp.task('jscsfixall', function() {
   // See here for why I specified a base: http://stackoverflow.com/a/24412960/3595355
   //return gulp.src(js_src, {base: './'})
-  return gulp.src(js_src)
+  return gulp.src(paths)
     .pipe(jscs({
         configPath: './.jscsrc', // it seems you need to specify your config path when you have fix set to true
         fix: true
@@ -77,7 +76,7 @@ gulp.task('jscsfixall', function() {
 
 
 gulp.task('lint', function() {
-  var result = gulp.src(js_src)
+  var result = gulp.src(paths)
     .pipe(jshint(jshintConfig))
     .pipe(jshint.reporter(stylish))
     // Use gulp-notify as jshint reporter 
@@ -100,14 +99,4 @@ gulp.task('lint', function() {
 gulp.task('size', function() {
 	return gulp.src(js_src)
 		.pipe(size());
-});
-
-watcher.on('change', function(event) {
-
-	console.log('\n\n');
-    console.log('-------------------------------------------------------------------------------');
-    console.log('-------------------------------New Gulp run below------------------------------');
-    console.log('-------------------------------------------------------------------------------');
-    console.log('\n\n');
-  	console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 });

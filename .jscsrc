@@ -1,5 +1,8 @@
 {
   "preset": "google",
+  "plugins": [
+    "jscs-jsdoc"
+  ],
   "disallowTrailingWhitespace": true,
   "excludeFiles": [
   ],
@@ -9,5 +12,10 @@
     "tabSize": 4,
     "allowUrlComments": true,
     "allowRegex": true
+  },
+  "jsDoc": {
+    "checkAnnotations": "closurecompiler",
+    "checkTypes": "strictNativeCase",
+    "enforceExistence": "exceptExports"
   }
 }

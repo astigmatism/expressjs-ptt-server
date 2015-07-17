@@ -1,9 +1,13 @@
-/**
- * Utilities
- */
 
+/**
+ * shuffles the items in an array
+ * @param  {Array} array
+ * @return {Array}
+ */
 exports.shuffle = function(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex ;
+    var currentIndex = array.length;
+    var temporaryValue;
+    var randomIndex;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
@@ -21,9 +25,14 @@ exports.shuffle = function(array) {
     return array;
 };
 
+/**
+ * Extend an object
+ * @param  {Object} target
+ * @return {Object}
+ */
 exports.extend = function extend(target) {
     var sources = [].slice.call(arguments, 1);
-    sources.forEach(function (source) {
+    sources.forEach(function(source) {
         for (var prop in source) {
             target[prop] = source[prop];
         }

@@ -1,26 +1,34 @@
 /**
  *
- * The User Controller acts as a delegate all incoming requests and outgoing responses as it relates to functionality associated with 
+ * The User Controller acts as a delegate all incoming requests and outgoing responses as it relates to functionality associated with
  * user's in general. This functionality differs from the User Model which is an instance of a user object from the mongo db.
- * 
+ *
  */
 
 var User            = require('../models/user');
 var UserService     = require('../services/users');
 var ErrorController = require('../controllers/error');
 
+/**
+ * User Controller
+ */
 UserController = function() {
-
 };
 
 //ADMIN API's
 
+/**
+ * Get all user information. admin auth required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.getUser = function(req, res) {
-    
-    var username    = req.params.username;
-    
+
+    var username = req.params.username;
+
     if (!username) {
-        return res.json(ErrorController.missingParameters('username')); 
+        return res.json(ErrorController.missingParameters('username'));
     }
 
     UserService.getUserByName(username, function(err, result) {
@@ -34,26 +42,37 @@ UserController.getUser = function(req, res) {
             user: result
         });
     });
-    
 };
 
+/**
+ * Remove card from a user. admin auth required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.removeCard = function(req, res) {
 
     var cardid    = req.params.cardid;
-    
+
     if (!cardid) {
         return res.json(ErrorController.missingParameters('cardid'));
     }
 };
 
+/**
+ * Give a random level card to a user. admin auth required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.giveRandomLevelCardToUser = function(req, res) {
 
-    var username  = req.body.username; 
+    var username  = req.body.username;
     var level   = req.body.level;
     var notes   = req.body.notes || '';
 
     if (!level || !username) {
-        return res.json(ErrorController.missingFormData('level or username')); 
+        return res.json(ErrorController.missingFormData('level or username'));
     }
 
     UserService.getUserByName(username, function(err, user) {
@@ -62,7 +81,7 @@ UserController.giveRandomLevelCardToUser = function(req, res) {
             return res.json(ErrorController.error(err));
         }
 
-        UserService.giveRandomLevelCardsToUser(user._id, level, notes, function (err, cardids) {
+        UserService.giveRandomLevelCardsToUser(user._id, level, notes, function(err, cardids) {
 
             if (err) {
                 return res.json(ErrorController.error(err));
@@ -78,6 +97,12 @@ UserController.giveRandomLevelCardToUser = function(req, res) {
 
 //AUTHENICATED USER API's
 
+/**
+ * Remove current user account. basic auth required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.removeAccount = function(req, res) {
 
     var user = new User(req.user);
@@ -94,8 +119,14 @@ UserController.removeAccount = function(req, res) {
     });
 };
 
+/**
+ * Gets all user's cards. basic auth required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.getCards = function(req, res) {
-    
+
     var user = new User(req.user);
 
     user.getCards(function(err, cards) {
@@ -110,6 +141,12 @@ UserController.getCards = function(req, res) {
     });
 };
 
+/**
+ * Get's last used cards. basic auth required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.getLastUsed = function(req, res) {
 
     var user = new User(req.user);
@@ -131,8 +168,14 @@ UserController.getLastUsed = function(req, res) {
 
 //UNAUTHENTICATED API's
 
+/**
+ * Creates new user account. No authentication required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.createAccount = function(req, res) {
-    
+
     var username    = req.body.username;
     var password    = req.body.password;
     var email       = req.body.email;
@@ -171,6 +214,12 @@ UserController.createAccount = function(req, res) {
     });
 };
 
+/**
+ * Token verification for new user. No authentication required
+ * @param  {Object} req
+ * @param  {Object} res
+ * @return {Object}
+ */
 UserController.tokenVerification = function(req, res) {
 
     var token = req.params.token;
@@ -181,10 +230,10 @@ UserController.tokenVerification = function(req, res) {
             error: {
                 message: 'a token was not included in the params'
             }
-        }); 
+        });
     }
 
-    UserService.tokenVerification(token, function (err) {
+    UserService.tokenVerification(token, function(err) {
         if (err) {
             return res.json({
                 success: false,

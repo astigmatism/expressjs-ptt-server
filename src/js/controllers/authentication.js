@@ -3,31 +3,35 @@ var passport = require('passport');
 var BasicStrategy = require('passport-http').BasicStrategy;
 var UserRecord = require('../schemas/user');
 
+/**
+ * Authentication controller.
+ */
 AuthenticationController = function() {
-
 };
 
 passport.use('basic', new BasicStrategy(
     function(username, password, callback) {
-        UserRecord.findOne({ username: username }, function (err, user) {
-            if (err) { 
-                return callback(err); 
+        UserRecord.findOne({
+            username: username
+        }, function(err, user) {
+            if (err) {
+                return callback(err);
             }
 
             // No user found with that username
-            if (!user) { 
-                return callback(null, false); 
+            if (!user) {
+                return callback(null, false);
             }
 
             // Make sure the password is correct
             user.verifyPassword(password, function(err, isMatch) {
-                if (err) { 
-                    return callback(err); 
+                if (err) {
+                    return callback(err);
                 }
 
                 // Password did not match
-                if (!isMatch) { 
-                    return callback(null, false); 
+                if (!isMatch) {
+                    return callback(null, false);
                 }
 
                 // Success
@@ -39,29 +43,31 @@ passport.use('basic', new BasicStrategy(
 
 passport.use('verified', new BasicStrategy(
     function(username, password, callback) {
-        UserRecord.findOne({ username: username }, function (err, user) {
-            if (err) { 
-                return callback(err); 
+        UserRecord.findOne({
+            username: username
+        }, function(err, user) {
+            if (err) {
+                return callback(err);
             }
 
             // No user found with that username
-            if (!user) { 
-                return callback(null, false); 
+            if (!user) {
+                return callback(null, false);
             }
 
             // Make sure the password is correct
             user.verifyPassword(password, function(err, isMatch) {
-                if (err) { 
-                    return callback(err); 
+                if (err) {
+                    return callback(err);
                 }
 
                 // Password did not match
-                if (!isMatch) { 
-                    return callback(null, false); 
+                if (!isMatch) {
+                    return callback(null, false);
                 }
 
                 if (!user.isVerified()) {
-                    return callback(null, false);   
+                    return callback(null, false);
                 }
 
                 // Success
@@ -75,25 +81,27 @@ passport.use('admin', new BasicStrategy({
         passReqToCallback: true
     },
     function(req, username, password, callback) {
-        
-        UserRecord.findOne({ username: username }, function (err, user) {
-            if (err) { 
-                return callback(err); 
+
+        UserRecord.findOne({
+            username: username
+        }, function(err, user) {
+            if (err) {
+                return callback(err);
             }
 
             // No user found with that username
-            if (!user) { 
-                return callback(null, false); 
+            if (!user) {
+                return callback(null, false);
             }
 
             // Make sure the password is correct
             user.verifyPassword(password, function(err, isMatch) {
-                if (err) { 
-                    return callback(err); 
+                if (err) {
+                    return callback(err);
                 }
 
                 // Password did not match
-                if (!isMatch) { 
+                if (!isMatch) {
                     return callback(null, false);
                 }
 
@@ -107,34 +115,48 @@ passport.use('admin', new BasicStrategy({
                     return callback(null, user);
                 }
 
-                return callback(null, false); 
+                return callback(null, false);
             });
         });
     }
 ));
 
-AuthenticationController.isAuthenticated = passport.authenticate('basic', { 
-    session : false 
+AuthenticationController.isAuthenticated = passport.authenticate('basic', {
+    session : false
 });
 
-AuthenticationController.isAuthenticatedAndVerified = passport.authenticate('verified', { 
-    session : false 
+AuthenticationController.isAuthenticatedAndVerified = passport.authenticate('verified', {
+    session : false
 });
 
+/**
+ * Sets body param to admin level 1 before passport authentication
+ * @param  {Object}   req
+ * @param  {Object}   res
+ * @param  {Function} next
+ * @return {undefined}
+ */
 AuthenticationController.adminLevel1Requied = function(req, res, next) {
-    
+
     req.body.adminlevel = 1;
 
-    passport.authenticate('admin', { 
+    passport.authenticate('admin', {
         session : false
     })(req, res, next);
 };
 
+/**
+ * Sets body param to admin level 10 before passport auth
+ * @param  {Object}   req
+ * @param  {Object}   res
+ * @param  {Function} next [description]
+ * @return {undefined}
+ */
 AuthenticationController.adminLevel10Requied = function(req, res, next) {
-    
+
     req.body.adminlevel = 10;
 
-    passport.authenticate('admin', { 
+    passport.authenticate('admin', {
         session : false
     })(req, res, next);
 };

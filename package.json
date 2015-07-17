@@ -6,8 +6,6 @@
     "start": "node ./bin/www",
     "test": "make test"
   },
-  "jscsConfig": {},
-  "jshintConfig": {},
   "dependencies": {
     "async": "^0.9.2",
     "bcrypt-nodejs": "0.0.3",
