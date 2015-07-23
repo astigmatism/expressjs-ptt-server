@@ -110,7 +110,7 @@ passport.use('admin', new BasicStrategy({
                 }
 
                 //make sure they have admin rights
-                if (user.adminlevel >= req.body.adminlevel) {
+                if (user.adminlevel >= req.params.adminlevel) {
                     // Success
                     return callback(null, user);
                 }
@@ -130,7 +130,7 @@ AuthenticationController.isAuthenticatedAndVerified = passport.authenticate('ver
 });
 
 /**
- * Sets body param to admin level 1 before passport authentication
+ * Sets request param to admin level 1 before passport authentication for checking against user later
  * @param  {Object}   req
  * @param  {Object}   res
  * @param  {Function} next
@@ -138,7 +138,7 @@ AuthenticationController.isAuthenticatedAndVerified = passport.authenticate('ver
  */
 AuthenticationController.adminLevel1Requied = function(req, res, next) {
 
-    req.body.adminlevel = 1;
+    req.params.adminlevel = 1; //by forcing this value here a user has no direct control over this param value in a send request
 
     passport.authenticate('admin', {
         session : false
@@ -146,7 +146,7 @@ AuthenticationController.adminLevel1Requied = function(req, res, next) {
 };
 
 /**
- * Sets body param to admin level 10 before passport auth
+ * Sets request param to admin level 10 before passport auth
  * @param  {Object}   req
  * @param  {Object}   res
  * @param  {Function} next [description]
@@ -154,7 +154,7 @@ AuthenticationController.adminLevel1Requied = function(req, res, next) {
  */
 AuthenticationController.adminLevel10Requied = function(req, res, next) {
 
-    req.body.adminlevel = 10;
+    req.params.adminlevel = 10; //by forcing this value here a user has no direct control over this param value in a send request
 
     passport.authenticate('admin', {
         session : false

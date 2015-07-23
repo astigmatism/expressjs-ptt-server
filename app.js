@@ -10,9 +10,6 @@ var passport = require('passport');
 
 var app = express();
 
-//setup routes
-require('./src/js/router.js')(app);
-
 //pull in app configuration
 config = configuration.data.production;
 
@@ -37,6 +34,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 
 mongoose.connect('mongodb://' + config.dbhost + '/' + config.dbname);
+
+//setup routes
+require('./src/js/router.js')(app);
 
 // error handlers
 
